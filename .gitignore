@@ -1,0 +1,26 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Djanngo stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.coverage
+htmlcov/
+visual_board/env.js
+node_modules/
+
+# IDE settings
+.idea/
+.vscode/
