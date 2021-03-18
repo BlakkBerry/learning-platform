@@ -1,3 +1,19 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
-# Create your models here.
+from users.managers import CustomUserManager
+
+
+class CustomUser(AbstractUser):
+    username = None
+    email = models.EmailField(_('email address'), unique=True)
+    is_teacher = models.BooleanField(default=False,
+                                     help_text='Designates whether the user can create courses and lesson materials.')
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+    objects = CustomUserManager()
+
+    def __str__(self):
+        return self.email
