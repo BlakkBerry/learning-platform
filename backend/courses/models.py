@@ -4,19 +4,21 @@ from django.db import models
 
 class Course(models.Model):
     name = models.CharField(max_length=100)
-    subject = models.CharField(max_length=100)
-    section = models.CharField(max_length=100)
-    audience = models.CharField(max_length=100)
+    description = models.TextField(null=True, blank=True)
+    subject = models.CharField(max_length=100, null=True)
+    section = models.CharField(max_length=100, null=True, blank=True)
+    audience = models.CharField(max_length=100, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     students = models.ManyToManyField(CustomUser, blank=True, related_name='courses')
-    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.name
 
 
-class Topic(models.Model):
+class Module(models.Model):
     name = models.CharField(max_length=100)
+    description = models.TextField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
@@ -26,18 +28,41 @@ class Topic(models.Model):
 
 class Lesson(models.Model):
     name = models.CharField(max_length=100)
+    description = models.TextField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
-    topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
+    module = models.ForeignKey(Module, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.topic}__{self.name}'
+        return f'{self.module}__{self.name}'
+
+
+class TaskBase(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(null=True, blank=True)
+    lesson = models.ForeignKey(Lesson, related_name='tasks', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.lesson}__{self.name}'
+
+
+class Task(TaskBase):
+    owner = models.ForeignKey(CustomUser, related_name='tasks', null=True, on_delete=models.SET_NULL)
+    max_score = models.IntegerField()
+    due_date = models.DateField()
+
+
+class HomeTask(TaskBase):
+    owner = models.ForeignKey(CustomUser, related_name='home_tasks', on_delete=models.CASCADE)
+    assignment = models.ForeignKey(Task, related_name='home_tasks', on_delete=models.CASCADE)
+    mark = models.IntegerField(blank=True, null=True)
 
 
 class ItemBase(models.Model):
-    owner = models.ForeignKey(CustomUser, null=True, on_delete=models.SET_NULL)
     title = models.CharField(max_length=250)
+    description = models.TextField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    task = models.ForeignKey(TaskBase, related_name='items', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
@@ -57,26 +82,3 @@ class Image(ItemBase):
 
 class Video(ItemBase):
     url = models.URLField()
-
-
-class Task(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField()
-    max_score = models.IntegerField()
-    due_date = models.DateField()
-    owner = models.ForeignKey(CustomUser, null=True, on_delete=models.SET_NULL)
-    items = models.ManyToManyField(ItemBase, blank=True)
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f'{self.lesson}__{self.name}'
-
-
-class Homework(models.Model):
-    owner = models.ForeignKey(CustomUser, related_name='homeworks', on_delete=models.CASCADE)
-    items = models.ManyToManyField(ItemBase, blank=True)
-    task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    mark = models.IntegerField()
-
-    def __str__(self):
-        return f'{self.task}__{self.owner}'
