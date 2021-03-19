@@ -8,7 +8,7 @@ class Course(models.Model):
     section = models.CharField(max_length=100)
     audience = models.CharField(max_length=100)
     created = models.DateTimeField(auto_now_add=True)
-    students = models.ManyToManyField(CustomUser, related_name='courses')
+    students = models.ManyToManyField(CustomUser, blank=True, related_name='courses')
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -21,7 +21,7 @@ class Topic(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
+        return f'{self.course}__{self.name}'
 
 
 class Lesson(models.Model):
@@ -30,7 +30,7 @@ class Lesson(models.Model):
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
+        return f'{self.topic}__{self.name}'
 
 
 class ItemBase(models.Model):
@@ -65,18 +65,18 @@ class Task(models.Model):
     max_score = models.IntegerField()
     due_date = models.DateField()
     owner = models.ForeignKey(CustomUser, null=True, on_delete=models.SET_NULL)
-    items = models.ForeignKey(ItemBase, null=True, on_delete=models.SET_NULL)
+    items = models.ManyToManyField(ItemBase, blank=True)
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
+        return f'{self.lesson}__{self.name}'
 
 
 class Homework(models.Model):
     owner = models.ForeignKey(CustomUser, related_name='homeworks', on_delete=models.CASCADE)
-    items = models.ForeignKey(ItemBase, null=True, on_delete=models.SET_NULL)
+    items = models.ManyToManyField(ItemBase, blank=True)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     mark = models.IntegerField()
 
     def __str__(self):
-        return f"Homework for {self.task} by {self.owner.email}"
+        return f'{self.task}__{self.owner}'
