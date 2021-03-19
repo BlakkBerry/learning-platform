@@ -8,7 +8,7 @@ class Course(models.Model):
     section = models.CharField(max_length=100)
     audience = models.CharField(max_length=100)
     created = models.DateTimeField(auto_now_add=True)
-    students = models.ManyToManyField(CustomUser, on_delete=models.CASCADE, related_name='courses')
+    students = models.ManyToManyField(CustomUser, related_name='courses')
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -34,13 +34,10 @@ class Lesson(models.Model):
 
 
 class ItemBase(models.Model):
-    owner = models.ForeignKey(CustomUser, on_delete=models.SET_NULL)
+    owner = models.ForeignKey(CustomUser, null=True, on_delete=models.SET_NULL)
     title = models.CharField(max_length=250)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        abstract = True
 
     def __str__(self):
         return self.title
@@ -51,11 +48,11 @@ class Text(ItemBase):
 
 
 class File(ItemBase):
-    file = models.FileField(upload_to='files')
+    file_item = models.FileField(upload_to='files')
 
 
 class Image(ItemBase):
-    file = models.FileField(upload_to='images')
+    image_item = models.FileField(upload_to='images')
 
 
 class Video(ItemBase):
@@ -67,8 +64,8 @@ class Task(models.Model):
     description = models.TextField()
     max_score = models.IntegerField()
     due_date = models.DateField()
-    owner = models.ForeignKey(CustomUser, on_delete=models.SET_NULL)
-    items = models.ForeignKey(ItemBase, on_delete=models.SET_NULL)
+    owner = models.ForeignKey(CustomUser, null=True, on_delete=models.SET_NULL)
+    items = models.ForeignKey(ItemBase, null=True, on_delete=models.SET_NULL)
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -77,7 +74,7 @@ class Task(models.Model):
 
 class Homework(models.Model):
     owner = models.ForeignKey(CustomUser, related_name='homeworks', on_delete=models.CASCADE)
-    items = models.ForeignKey(ItemBase, on_delete=models.SET_NULL)
+    items = models.ForeignKey(ItemBase, null=True, on_delete=models.SET_NULL)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     mark = models.IntegerField()
 
