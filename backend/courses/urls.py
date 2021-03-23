@@ -3,6 +3,7 @@ from .views import *
 
 router = DefaultRouter()
 router.register(r'courses', CourseAPI, basename='course')
+router.register(r'courses_requests', CourseRequestAPI, basename='course_request')
 router.register(r'modules', ModuleAPI, basename='module')
 router.register(r'lessons', LessonAPI, basename='lesson')
 router.register(r'tasks', TaskAPI, basename='task')

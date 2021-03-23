@@ -8,8 +8,6 @@ from users.managers import CustomUserManager
 class CustomUser(AbstractUser):
     username = None
     email = models.EmailField(_('email address'), unique=True)
-    is_teacher = models.BooleanField(default=False,
-                                     help_text='Designates whether the user can create courses and lesson materials.')
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

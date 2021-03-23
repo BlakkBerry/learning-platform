@@ -17,6 +17,13 @@ class CourseSerializer(serializers.ModelSerializer):
         return value
 
 
+class CourseRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseRequest
+        fields = '__all__'
+        read_only_fields = ('student',)
+
+
 class ModuleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Module

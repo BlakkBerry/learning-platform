@@ -1,10 +1,17 @@
+from django.utils.crypto import get_random_string
 from users.models import CustomUser
 from django.db import models
+import string
 
 
 class Course(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)
+    code = models.CharField(max_length=6,
+                            blank=True,
+                            editable=False,
+                            unique=True,
+                            default=get_random_string(6, allowed_chars=string.ascii_uppercase + string.digits))
     subject = models.CharField(max_length=100, null=True)
     section = models.CharField(max_length=100, null=True, blank=True)
     audience = models.CharField(max_length=100, null=True, blank=True)
@@ -14,6 +21,14 @@ class Course(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class CourseRequest(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    student = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'Request to {self.course} by {self.student}'
 
 
 class Module(models.Model):

@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status, mixins
 from rest_framework.response import Response
 from django.db.models import Q
 from .serializer import *
@@ -44,6 +44,29 @@ class CourseAPI(viewsets.ModelViewSet):
                 return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CourseRequestAPI(viewsets.GenericViewSet,
+                       mixins.RetrieveModelMixin,
+                       mixins.ListModelMixin,
+                       mixins.DestroyModelMixin,
+                       mixins.CreateModelMixin):
+    serializer_class = CourseRequestSerializer
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+
+    def get_queryset(self):
+        user = self.request.user.id
+
+        return CourseRequest.objects.filter(course__author=user)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        course_request = serializer.save(student=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED,
+                        headers={'course_request_url': f'{request.build_absolute_uri()}{course_request.id}'})
 
 
 class ModuleAPI(viewsets.ModelViewSet):
