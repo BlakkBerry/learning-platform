@@ -1,7 +1,6 @@
 from django.utils.crypto import get_random_string
 from users.models import CustomUser
 from django.db import models
-import string
 
 
 class Course(models.Model):
@@ -11,7 +10,7 @@ class Course(models.Model):
                             blank=True,
                             editable=False,
                             unique=True,
-                            default=get_random_string(6, allowed_chars=string.ascii_uppercase + string.digits))
+                            default=lambda: get_random_string(6))
     subject = models.CharField(max_length=100, null=True)
     section = models.CharField(max_length=100, null=True, blank=True)
     audience = models.CharField(max_length=100, null=True, blank=True)
