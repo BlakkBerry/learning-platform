@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import *
 
 
@@ -6,6 +7,14 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = '__all__'
+        read_only_fields = ('author',)
+
+    def validate_students(self, value):
+        author = self.context['request'].user.id
+        data = self.get_initial()
+        if str(author) in data['students']:
+            raise serializers.ValidationError('the author cannot be a student')
+        return value
 
 
 class ModuleSerializer(serializers.ModelSerializer):
