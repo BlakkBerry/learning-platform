@@ -3,6 +3,10 @@ from users.models import CustomUser
 from django.db import models
 
 
+def get_random_hash():
+    return get_random_string(6)
+
+
 class Course(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)
@@ -10,7 +14,7 @@ class Course(models.Model):
                             blank=True,
                             editable=False,
                             unique=True,
-                            default=lambda: get_random_string(6))
+                            default=get_random_hash)
     subject = models.CharField(max_length=100, null=True)
     section = models.CharField(max_length=100, null=True, blank=True)
     audience = models.CharField(max_length=100, null=True, blank=True)
