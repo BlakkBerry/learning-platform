@@ -57,21 +57,21 @@ class Lesson(models.Model):
 class TaskBase(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)
-    lesson = models.ForeignKey(Lesson, related_name='tasks', on_delete=models.CASCADE)
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
 
     def __str__(self):
         return f'{self.lesson}__{self.name}'
 
 
 class Task(TaskBase):
-    owner = models.ForeignKey(CustomUser, related_name='tasks', null=True, on_delete=models.SET_NULL)
+    owner = models.ForeignKey(CustomUser, null=True, on_delete=models.SET_NULL)
     max_score = models.IntegerField()
     due_date = models.DateField()
 
 
 class HomeTask(TaskBase):
-    owner = models.ForeignKey(CustomUser, related_name='home_tasks', on_delete=models.CASCADE)
-    assignment = models.ForeignKey(Task, related_name='home_tasks', on_delete=models.CASCADE)
+    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    assignment = models.ForeignKey(Task, on_delete=models.CASCADE)
     mark = models.IntegerField(blank=True, null=True)
 
 
@@ -80,7 +80,7 @@ class ItemBase(models.Model):
     description = models.TextField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    task = models.ForeignKey(TaskBase, related_name='items', on_delete=models.CASCADE)
+    task = models.ForeignKey(TaskBase, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title

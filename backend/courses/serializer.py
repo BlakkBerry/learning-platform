@@ -23,6 +23,16 @@ class CourseRequestSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('student',)
 
+    def validate_course(self, value):
+        print(CustomUser.courses.all())
+        data = self.get_initial()
+        course = Course.objects.get(pk=data['course'])
+        students = [student.id for student in course.students.all()]
+        author = self.context['request'].user.id
+        if author == course.author.id or author in students:
+            raise serializers.ValidationError('you are already in this course')
+        return value
+
 
 class ModuleSerializer(serializers.ModelSerializer):
     class Meta:

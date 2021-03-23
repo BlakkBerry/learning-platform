@@ -58,7 +58,6 @@ class CourseRequestAPI(viewsets.GenericViewSet,
 
     def get_queryset(self):
         user = self.request.user.id
-
         return CourseRequest.objects.filter(course__author=user)
 
     def create(self, request, *args, **kwargs):
