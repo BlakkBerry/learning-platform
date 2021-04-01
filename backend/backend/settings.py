@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 from environs import Env
 
@@ -43,7 +43,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'courses',
     'users',
+    'drf_yasg',
 ]
+
+REST_FRAMEWORK = {'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
