@@ -29,6 +29,7 @@ class Course(models.Model):
 class CourseRequest(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     student = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    code = models.CharField(max_length=Course._meta.get_field('code').max_length)
 
     def __str__(self):
         return f'Request to {self.course} by {self.student}'
@@ -100,3 +101,4 @@ class Image(ItemBase):
 
 class Video(ItemBase):
     url = models.URLField()
+

@@ -63,9 +63,9 @@ class CourseRequestAPI(viewsets.GenericViewSet,
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        course_request = serializer.save(student=request.user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED,
-                        headers={'course_request_url': f'{request.build_absolute_uri()}{course_request.id}'})
+        course = get_object_or_404(Course, code=request.data['code'])
+        serializer.save(student=request.user, course=course)
+        return Response(status=status.HTTP_200_OK)
 
 
 class ModuleAPI(viewsets.ModelViewSet):

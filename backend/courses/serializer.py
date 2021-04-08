@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from .models import *
@@ -7,7 +8,7 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = '__all__'
-        read_only_fields = ('author',)
+        read_only_fields = ('author', 'code',)
 
     def validate_students(self, value):
         author = self.context['request'].user.id
@@ -21,16 +22,21 @@ class CourseRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseRequest
         fields = '__all__'
-        read_only_fields = ('student',)
+        read_only_fields = ('student', 'course',)
+        extra_kwargs = {
+            'code': {'write_only': True},
+        }
 
-    def validate_course(self, value):
-        print(CustomUser.courses.all())
+    def validate_code(self, value):
         data = self.get_initial()
-        course = Course.objects.get(pk=data['course'])
+        course = get_object_or_404(Course, code=data['code'])
         students = [student.id for student in course.students.all()]
         author = self.context['request'].user.id
         if author == course.author.id or author in students:
             raise serializers.ValidationError('you are already in this course')
+        student_r = [request.student.id for request in CourseRequest.objects.all()]
+        if author in student_r:
+            raise serializers.ValidationError('you have already requested this course')
         return value
 
 
