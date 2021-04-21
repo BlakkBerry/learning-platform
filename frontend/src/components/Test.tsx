@@ -19,7 +19,7 @@ const TestComponent: React.FC = () => {
     }
 
     return <div>
-        <ul>
+        <ul id="users">
             {users.map(user => <li key={user.id}>{user.name}</li>)}
         </ul>
     </div>
