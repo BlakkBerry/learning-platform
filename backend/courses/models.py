@@ -58,22 +58,24 @@ class Lesson(models.Model):
 class TaskBase(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)
+
+
+class Task(TaskBase):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    max_score = models.IntegerField()
+    due_date = models.DateField()
 
     def __str__(self):
         return f'{self.lesson}__{self.name}'
 
 
-class Task(TaskBase):
-    owner = models.ForeignKey(CustomUser, null=True, on_delete=models.SET_NULL)
-    max_score = models.IntegerField()
-    due_date = models.DateField()
-
-
 class HomeTask(TaskBase):
-    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='home_task_set')
     assignment = models.ForeignKey(Task, on_delete=models.CASCADE)
     mark = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return f'{self.assignment}__{self.name}'
 
 
 class ItemBase(models.Model):
@@ -102,3 +104,9 @@ class Image(ItemBase):
 class Video(ItemBase):
     url = models.URLField()
 
+
+class Mark(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    student = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    score = models.IntegerField(default=None, blank=True, null=True)
+    max_score = models.IntegerField(blank=False)

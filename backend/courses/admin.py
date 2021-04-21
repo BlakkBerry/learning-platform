@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from courses.models import *
 
 # Register your models here.
@@ -12,3 +13,4 @@ admin.site.register(File)
 admin.site.register(Image)
 admin.site.register(Text)
 admin.site.register(Video)
+admin.site.register(Mark)
