@@ -1,6 +1,9 @@
+from datetime import datetime
+
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
+from users.serializer import CustomUserSerializer
 from .models import *
 
 
@@ -19,10 +22,12 @@ class CourseSerializer(serializers.ModelSerializer):
 
 
 class CourseRequestSerializer(serializers.ModelSerializer):
+    student = CustomUserSerializer(many=False, read_only=True)
+
     class Meta:
         model = CourseRequest
-        fields = '__all__'
-        read_only_fields = ('student', 'course',)
+        fields = ('id', 'student', 'code',)
+        read_only_fields = ('student',)
         extra_kwargs = {
             'code': {'write_only': True},
         }
@@ -43,25 +48,46 @@ class CourseRequestSerializer(serializers.ModelSerializer):
 class ModuleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Module
-        fields = '__all__'
+        exclude = ('course',)
 
 
 class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
-        fields = '__all__'
+        exclude = ('module',)
 
 
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = '__all__'
+        exclude = ('lesson',)
+
+    def validate_due_date(self, value):
+        if value < datetime.now().date():
+            raise serializers.ValidationError('date cannot be past')
+        return value
 
 
 class HomeTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = HomeTask
         fields = '__all__'
+        read_only_fields = ('owner',)
+
+    def validate_assignment(self, value):
+        requested_user = self.context['request'].user.id
+        students = [student.id for student in Task.objects.get(pk=value).lesson.module.course.students.all()]
+        if requested_user not in students:
+            raise serializers.ValidationError('incorrect assignment')
+        return value
+
+    def validate_mark(self, value):
+        requested_user = self.context['request'].user.id
+        course_user = Task.objects.get(pk=int(self.get_initial().get('assignment'))).lesson.module.course.author.id
+        print(course_user)
+        if value is not None and requested_user != course_user:
+            raise serializers.ValidationError("you can't judge yourself")
+        return value
 
 
 class TextSerializer(serializers.ModelSerializer):
@@ -85,4 +111,10 @@ class ImageSerializer(serializers.ModelSerializer):
 class VideoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Video
+        fields = '__all__'
+
+
+class MarkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Mark
         fields = '__all__'
