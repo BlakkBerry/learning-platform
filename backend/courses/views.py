@@ -94,13 +94,13 @@ class ModuleAPI(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user.id
-        return Module.objects.filter(Q(course__author=user) | Q(course__students=user)).order_by('id').distinct('id')
+        return Module.objects.filter(
+            Q(course__author=user) |
+            Q(course__students=user)) \
+            .order_by('id').distinct('id')
 
     def list(self, request, *args, **kwargs):
-        user = self.request.user.id
-        course = get_object_or_404(Course,
-                                   Q(pk=kwargs['pk'], author=user) | Q(pk=kwargs['pk'], students=user))
-        queryset = self.get_queryset().filter(course=course)
+        queryset = self.get_queryset().filter(course=kwargs['pk'])
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -164,21 +164,20 @@ class LessonAPI(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user.id
-        return Lesson.objects.filter(Q(module__course__author=user) | Q(module__course__students=user)).order_by(
-            'id').distinct('id')
+        return Lesson.objects.filter(
+            Q(module__course__author=user) |
+            Q(module__course__students=user)) \
+            .order_by('id').distinct('id')
 
     def list(self, request, *args, **kwargs):
         user = self.request.user.id
 
-        module = get_object_or_404(Module,
-                                   Q(pk=kwargs['mpk'],
-                                     course__pk=kwargs['pk'],
-                                     course__author=user) |
-                                   Q(pk=kwargs['mpk'],
-                                     course__pk=kwargs['pk'],
-                                     course__students=user))
+        module = get_object_or_404(Module, pk=kwargs['mpk'], course__pk=kwargs['pk'])
 
-        queryset = self.get_queryset().filter(module=module)
+        queryset = self.get_queryset().filter(
+            Q(module=module, module__course__students=user) |
+            Q(module=module, module__course__author=user))
+
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -246,22 +245,21 @@ class TaskAPI(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user.id
         return Task.objects.filter(
-            Q(lesson__module__course__author=user) | Q(lesson__module__course__students=user)).order_by('id').distinct(
-            'id')
+            Q(lesson__module__course__author=user) |
+            Q(lesson__module__course__students=user)) \
+            .order_by('id').distinct('id')
 
     def list(self, request, *args, **kwargs):
         user = self.request.user.id
         lesson = get_object_or_404(Lesson,
-                                   Q(pk=kwargs['lpk'],
-                                     module__pk=kwargs['mpk'],
-                                     module__course__pk=kwargs['pk'],
-                                     module__course__author=user) |
-                                   Q(pk=kwargs['lpk'],
-                                     module__pk=kwargs['mpk'],
-                                     module__course__pk=kwargs['pk'],
-                                     module__course__students=user))
+                                   pk=kwargs['lpk'],
+                                   module__pk=kwargs['mpk'],
+                                   module__course__pk=kwargs['pk'])
 
-        queryset = self.get_queryset().filter(lesson=lesson)
+        queryset = self.get_queryset().filter(
+            Q(lesson=lesson, lesson__module__course__students=user)
+            | Q(lesson=lesson, lesson__module__course__author=user))
+
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -323,7 +321,6 @@ class TaskAPI(viewsets.ModelViewSet):
 
 class HomeTaskAPI(viewsets.ModelViewSet):
     serializer_class = HomeTaskSerializer
-    queryset = HomeTask.objects.all()
     permission_classes = [
         permissions.IsAuthenticated
     ]
@@ -331,26 +328,22 @@ class HomeTaskAPI(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user.id
         return HomeTask.objects.filter(
-            Q(assignment__lesson__module__course__author=user) | Q(
-                assignment__lesson__module__course__students=user)).order_by('id').distinct('id')
+            Q(assignment__lesson__module__course__author=user) |
+            Q(assignment__lesson__module__course__students=user)) \
+            .order_by('id').distinct('id')
 
     def list(self, request, *args, **kwargs):
         user = self.request.user
 
         task = get_object_or_404(Task,
-                                 Q(pk=kwargs['tpk'],
-                                   lesson__pk=kwargs['lpk'],
-                                   lesson__module__pk=kwargs['mpk'],
-                                   lesson__module__course__pk=kwargs['pk'],
-                                   lesson__module__course__author=user) |
-                                 Q(
-                                     pk=kwargs['tpk'],
-                                     lesson__pk=kwargs['lpk'],
-                                     lesson__module__pk=kwargs['mpk'],
-                                     lesson__module__course__pk=kwargs['pk'],
-                                     lesson__module__course__students=user))
+                                 pk=kwargs['tpk'],
+                                 lesson__pk=kwargs['lpk'],
+                                 lesson__module__pk=kwargs['mpk'],
+                                 lesson__module__course__pk=kwargs['pk'])
 
-        queryset = self.get_queryset().filter(assignment=task)
+        queryset = self.get_queryset().filter(
+            Q(assignment=task, assignment__lesson__module__course__students=user) |
+            Q(assignment=task, assignment__lesson__module__course__author=user))
 
         students = [student for student in task.lesson.module.course.students.get_queryset()]
 
@@ -371,9 +364,10 @@ class HomeTaskAPI(viewsets.ModelViewSet):
                                               assignment__lesson__module=kwargs['mpk'],
                                               assignment__lesson=kwargs['lpk'],
                                               assignment=kwargs['tpk'])
-        course = get_object_or_404(Course,
-                                   Q(pk=kwargs['pk'], author=user) | Q(pk=kwargs['pk'], students=user))
-        students = [student for student in course.students.get_queryset()]
+
+        students = [student for student in
+                    get_object_or_404(self.get_queryset(),
+                                      pk=kwargs['htpk']).assignment.lesson.module.course.students.get_queryset()]
         if user in students:
             queryset = queryset.filter(owner=user)
         instance = get_object_or_404(queryset, pk=kwargs['htpk'])
@@ -403,29 +397,45 @@ class HomeTaskAPI(viewsets.ModelViewSet):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, *args, **kwargs):
-        try:
-            instance = self.get_queryset().filter(assignment__lesson__module__course=kwargs['pk'],
-                                                  assignment__lesson__module=kwargs['mpk'],
-                                                  assignment__lesson=kwargs['lpk'],
-                                                  assignment=kwargs['tpk'],
-                                                  pk=kwargs['htpk'])
-        except HomeTask.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
+        task = get_object_or_404(Task,
+                                 pk=kwargs['tpk'],
+                                 lesson__pk=kwargs['lpk'],
+                                 lesson__module__pk=kwargs['mpk'],
+                                 lesson__module__course__pk=kwargs['pk'])
+
+        instance = self.get_queryset().filter(
+            Q(assignment=task, assignment__lesson__module__course__students=request.user) |
+            Q(assignment=task, assignment__lesson__module__course__author=request.user))
 
         if not instance:
             return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
-        students = [student for student in instance.get().assignment.lesson.module.course.students.get_queryset()]
+        students = [student for student in
+                    get_object_or_404(self.get_queryset(),
+                                      pk=kwargs['htpk']).assignment.lesson.module.course.students.get_queryset()]
+
         if request.user in students:
-            instance = instance.filter(owner=request.user).get()
-            if instance.assignment.due_date >= datetime.now().date():
+            instance = instance.filter(owner=request.user)
+            if instance.get().assignment.due_date >= datetime.now().date():
                 serializer = self.get_serializer(instance, data=request.data)
                 serializer.is_valid(raise_exception=True)
                 self.perform_update(serializer)
                 return Response(serializer.data)
-        if request.user == instance.assignment.lesson.module.course.author:
-            serializer = self.get_serializer(instance, data=request.data)
+        if request.user == instance.get().assignment.lesson.module.course.author:
+            serializer = self.get_serializer(instance.get(), data=request.data)
             serializer.is_valid(raise_exception=True)
             self.perform_update(serializer)
+            m = instance.get().assignment.mark_set
+            if len(m.all()):
+                m = m.get()
+                m.task = instance.get().assignment
+                m.student = instance.get().owner
+                m.score = instance.get().mark
+                m.max_score = instance.get().assignment.max_score
+                m.save()
+            else:
+                mark = Mark(task=instance.get().assignment, student=instance.get().owner, score=instance.get().mark,
+                            max_score=instance.get().assignment.max_score)
+                mark.save()
             return Response(serializer.data)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -478,32 +488,38 @@ class VideoAPI(viewsets.ModelViewSet):
     ]
 
 
-# class MarkAPI(viewsets.ReadOnlyModelViewSet):
-#     permissions = permissions.IsAuthenticated
-#     serializer_class = MarkSerializer
-#
-#     def retrieve(self, request, *args, **kwargs):
-#         course = get_object_or_404(Course, pk=kwargs['pk'])
-#         students = [student.id for student in course.students.all()]
-#         author = self.request.user.id
-#
-#         if author == course.author.id or author in students:
-#             return Response({'status': 'ok', })
-#
-#         return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
-
-class MarkAPI(viewsets.ReadOnlyModelViewSet):
+class MarkAPI(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = MarkSerializer
-    queryset = Mark.objects.all()
     permission_classes = [
         permissions.IsAuthenticated
     ]
 
-    def retrieve(self, request, *args, **kwargs):
-        # check if it`s author of the course
-        super().retrieve(request, *args, **kwargs)
-        # students = Course.objects.get(**kwargs).students.all()
-        # print(CustomUser.objects.get(pk=self.request.user.id).task_set.all())  # all user tasks
-        # print([student.home_task_set.all() for student in students])  # all student homework
+    def get_queryset(self):
+        user = self.request.user.id
+        return Mark.objects.filter(
+            Q(task__lesson__module__course__author=user) |
+            Q(task__lesson__module__course__students=user)) \
+            .order_by('id').distinct('id')
 
-        # return Response(status=status.HTTP_200_OK)
+    def list(self, request, *args, **kwargs):
+        user = self.request.user
+
+        course = get_object_or_404(Course, pk=kwargs['pk'])
+
+        queryset = self.get_queryset().filter(
+            Q(task__lesson__module__course=course, task__lesson__module__course__students=user) |
+            Q(task__lesson__module__course=course, task__lesson__module__course__author=user))
+
+        students = [student for student in course.students.get_queryset()]
+        if user not in students and user != course.author:
+            return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
+        if user in students:
+            queryset = queryset.filter(student=user)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)

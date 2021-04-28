@@ -67,6 +67,11 @@ class TaskSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('date cannot be past')
         return value
 
+    def validate_max_score(self, value):
+        if value <= 0:
+            raise serializers.ValidationError('mark cannot be negative')
+        return value
+
 
 class HomeTaskSerializer(serializers.ModelSerializer):
     class Meta:
@@ -76,15 +81,19 @@ class HomeTaskSerializer(serializers.ModelSerializer):
 
     def validate_assignment(self, value):
         requested_user = self.context['request'].user.id
-        students = [student.id for student in Task.objects.get(pk=value).lesson.module.course.students.all()]
-        if requested_user not in students:
+        task = Task.objects.get(pk=value)
+        students = [student.id for student in task.lesson.module.course.students.all()]
+        if requested_user not in students and requested_user != task.lesson.module.course.author.id:
             raise serializers.ValidationError('incorrect assignment')
         return value
 
     def validate_mark(self, value):
         requested_user = self.context['request'].user.id
-        course_user = Task.objects.get(pk=int(self.get_initial().get('assignment'))).lesson.module.course.author.id
-        print(course_user)
+        task = Task.objects.get(pk=int(self.get_initial().get('assignment')))
+
+        course_user = task.lesson.module.course.author.id
+        if value is not None and (value < 0 or value > task.max_score):
+            raise serializers.ValidationError('value must be in range [0, max score]')
         if value is not None and requested_user != course_user:
             raise serializers.ValidationError("you can't judge yourself")
         return value
@@ -115,6 +124,9 @@ class VideoSerializer(serializers.ModelSerializer):
 
 
 class MarkSerializer(serializers.ModelSerializer):
+    student = CustomUserSerializer(many=False, read_only=True)
+
     class Meta:
         model = Mark
         fields = '__all__'
+        depth = 1

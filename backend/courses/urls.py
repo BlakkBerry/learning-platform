@@ -4,7 +4,6 @@ from rest_framework.routers import DefaultRouter
 from .views import *
 
 router = DefaultRouter()
-# marks !!!!
 router.register(r'texts', TextAPI, basename='text')
 router.register(r'files', FileAPI, basename='file')
 router.register(r'images', ImageAPI, basename='image')
@@ -45,6 +44,7 @@ course_url = [
     path('', CourseAPI.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'})),
     path('requests/', include(requests_url)),
     path('modules/', include(modules_url)),
+    path('marks/', MarkAPI.as_view({'get': 'list'})),
 ]
 
 courses_url = [
