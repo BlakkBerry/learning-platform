@@ -11,7 +11,7 @@ export const fetchCourses = () => {
         } catch (error) {
             dispatch({
                 type: CourseActionTypes.FETCH_COURSES_ERROR,
-                payload: 'Fetching courses error' // TODO set error with error type
+                payload: {code: error.response.status, message: 'Fetching courses error'}
             })
         }
     }
@@ -26,7 +26,7 @@ export const createCourse = (course: Course) => {
         } catch (error) {
             dispatch({
                 type: CourseActionTypes.CREATE_SINGLE_COURSE_ERROR,
-                payload: 'Failed to create course'
+                payload: {code: error.response.status, message: 'Failed to create course'}
             })
         }
     }
@@ -39,7 +39,7 @@ export const updateCourse = (courseId: number, course: Partial<Course>) => {
             const response = await axios.put(`http://127.0.0.1:8000/api/courses/${courseId}/`, course)
             dispatch({type: CourseActionTypes.UPDATE_SINGLE_COURSE_SUCCESS, payload: response.data})
         } catch (error) {
-            dispatch({type: CourseActionTypes.UPDATE_SINGLE_COURSE_ERROR, payload: `Failed to update course with ID ${courseId}`})
+            dispatch({type: CourseActionTypes.UPDATE_SINGLE_COURSE_ERROR, payload: {code: error.response.status, message: `Failed to update course with ID ${courseId}`}})
         }
     }
 }
@@ -53,7 +53,7 @@ export const deleteCourse = (courseId: number) => {
         } catch (error) {
             dispatch({
                 type: CourseActionTypes.DELETE_SINGLE_COURSE_ERROR,
-                payload: `Failed to delete course with ID ${courseId}`
+                payload: {code: error.response.status, message: `Failed to delete course with ID ${courseId}`}
             })
         }
     }

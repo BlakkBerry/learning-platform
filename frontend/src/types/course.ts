@@ -1,3 +1,5 @@
+import {RequestError} from "./error";
+
 export interface Course {
     id?: number
     name: string
@@ -20,7 +22,7 @@ interface FetchCoursesSuccessAction {
 }
 interface FetchCoursesErrorAction {
     type: CourseActionTypes.FETCH_COURSES_ERROR
-    payload: string // TODO error type
+    payload: RequestError
 }
 
 interface CreateCourseAction {
@@ -32,7 +34,7 @@ interface CreateCourseSuccessAction {
 }
 interface CreateCourseErrorAction {
     type: CourseActionTypes.CREATE_SINGLE_COURSE_ERROR
-    payload: string // TODO error type
+    payload: RequestError
 }
 
 interface UpdateCourseAction {
@@ -44,7 +46,7 @@ interface UpdateCourseSuccessAction {
 }
 interface UpdateCourseErrorAction {
     type: CourseActionTypes.UPDATE_SINGLE_COURSE_ERROR
-    payload: string
+    payload: RequestError
 }
 
 interface DeleteCourseAction {
@@ -56,13 +58,13 @@ interface DeleteCourseSuccessAction {
 }
 interface DeleteCourseErrorAction {
     type: CourseActionTypes.DELETE_SINGLE_COURSE_ERROR
-    payload: string
+    payload: RequestError
 }
 
 export interface CourseState {
     courses: Array<Course>
     loading: boolean
-    error: string | null // TODO Create error type
+    error: RequestError | null
 }
 
 export enum CourseActionTypes {

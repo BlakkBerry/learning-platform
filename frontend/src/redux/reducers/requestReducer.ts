@@ -1,4 +1,5 @@
 import {Request, RequestAction, RequestActionTypes, RequestState} from "../../types/request";
+import {RequestError} from "../../types/error";
 
 const initialState: RequestState = {
     requests: [],
@@ -9,7 +10,7 @@ const initialState: RequestState = {
 export const requestReducer = (state: RequestState = initialState, action: RequestAction): RequestState => {
     const setLoading = (): RequestState => ({...state, loading: true, error: null})
     const setSuccess = (requests: Array<Request>): RequestState => ({...state, loading: false, error: null, requests})
-    const setError = (error: string): RequestState => ({...state, loading: false, error: error}) // TODO change error type
+    const setError = (error: RequestError): RequestState => ({...state, loading: false, error: error}) // TODO change error type
 
     switch (action.type) {
         case RequestActionTypes.CREATE_COURSE_REQUEST:

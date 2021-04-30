@@ -1,3 +1,5 @@
+import {RequestError} from "./error";
+
 export interface Request {
     id: number
     student: any // TODO change type
@@ -13,13 +15,13 @@ interface CreateCourseRequestSuccessAction {
 }
 interface CreateCourseRequestErrorAction {
     type: RequestActionTypes.CREATE_COURSE_REQUEST_ERROR
-    payload: string // TODO set error type
+    payload: RequestError
 }
 
 export interface RequestState {
     requests: Array<Request>
     loading: boolean
-    error: string | null // TODO Create error type
+    error: RequestError | null
 }
 
 export enum RequestActionTypes {

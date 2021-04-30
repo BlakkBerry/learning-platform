@@ -9,7 +9,7 @@ export const createCourseRequest = (code: string) => {
             const response = await axios.post<Request>('http://127.0.0.1:8000/api/courses/request/', {code})
             dispatch({type: RequestActionTypes.CREATE_COURSE_REQUEST_SUCCESS, payload: response.data})
         } catch (error) {
-            dispatch({type: RequestActionTypes.CREATE_COURSE_REQUEST_ERROR, payload: 'Failed to send course request'})
+            dispatch({type: RequestActionTypes.CREATE_COURSE_REQUEST_ERROR, payload: {code: error.response.status, message: 'Failed to send course request'}})
         }
     }
 }

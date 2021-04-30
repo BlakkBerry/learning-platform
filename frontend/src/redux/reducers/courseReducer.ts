@@ -1,4 +1,5 @@
 import {Course, CourseAction, CourseActionTypes, CourseState} from "../../types/course";
+import {RequestError} from "../../types/error";
 
 const initialState: CourseState = {
     courses: [],
@@ -9,7 +10,7 @@ const initialState: CourseState = {
 export const courseReducer = (state = initialState, action: CourseAction): CourseState => {
     const setLoading = (): CourseState => ({...state, loading: true, error: null})
     const setSuccess = (courses: Array<Course>): CourseState => ({...state, loading: false, error: null, courses: courses})
-    const setError = (error: string): CourseState => ({...state, loading: false, error: error}) // TODO change error type
+    const setError = (error: RequestError): CourseState => ({...state, loading: false, error: error}) // TODO change error type
 
     switch (action.type) {
         case CourseActionTypes.FETCH_COURSES:

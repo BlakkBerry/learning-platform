@@ -40,8 +40,11 @@ const TestComponent: React.FC = () => {
         return <div style={{color: 'blue'}}>Loading...</div>
     }
 
-    if (error || requestsError) {
-        return <div style={{color: 'red'}}>{error || requestsError}</div>
+    if (error) {
+        return <div style={{color: 'red'}}>{error.message}</div>
+    }
+    if (requestsError) {
+        return <div style={{color: 'red'}}>{requestsError.message}</div>
     }
 
     return <div>
