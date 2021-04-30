@@ -45,9 +45,12 @@ INSTALLED_APPS = [
     'courses',
     'users',
     'drf_yasg',
+    'knox',
+    'accounts',
 ]
 
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',),
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
     'PAGINATE_BY': 100,
     # enable in production
