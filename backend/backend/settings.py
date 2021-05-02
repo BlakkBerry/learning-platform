@@ -24,7 +24,7 @@ env.read_env()
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '1tyd-$jyv+ovej9u4@lh)5&$$+(#!&4dlvq_qu7fjc+4=acif3'
+SECRET_KEY = env.str('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -52,10 +52,10 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',),
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
-    'PAGINATE_BY': 100,
+    'PAGINATE_BY': 20,
     # enable in production
     # 'DEFAULT_RENDERER_CLASSES': [
-    # 'rest_framework.renderers.JSONRenderer',
+    #     'rest_framework.renderers.JSONRenderer',
     # ]
 }
 
