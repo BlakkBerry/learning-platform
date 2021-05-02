@@ -2,6 +2,8 @@ import React, {useEffect} from "react";
 import {useTypedSelector} from "../hooks/useTypedSelector";
 import {useActions} from "../hooks/useActions";
 import {Course} from "../types/course";
+import {Module} from "../types/module";
+import Test2 from "./Test2";
 
 const TestComponent: React.FC = () => {
     const {courses, loading, error} = useTypedSelector(state => state.courses)
@@ -10,12 +12,16 @@ const TestComponent: React.FC = () => {
     const requestsLoading = requestState.loading
     const requestsError = requestState.error
 
+
     const {
         fetchCourses,
         createCourse,
         deleteCourse,
         updateCourse,
-        createCourseRequest
+        createCourseRequest,
+        getRequestsForCourse,
+        deleteCourseRequest,
+        createModule
     } = useActions()
 
     const course: Course = {
@@ -27,6 +33,10 @@ const TestComponent: React.FC = () => {
         students: [],
         author: 1
     }
+    const module: Module = {
+        name: 'Module hello',
+        description: 'Desc hello'
+    }
 
     const partialCourse: Partial<Course> = {
         name: "string2"
@@ -35,6 +45,7 @@ const TestComponent: React.FC = () => {
     useEffect(() => {
         fetchCourses()
     }, [])
+
 
     if (loading || requestsLoading) {
         return <div style={{color: 'blue'}}>Loading...</div>
@@ -51,9 +62,18 @@ const TestComponent: React.FC = () => {
         <button onClick={() => createCourse(course)}>Create</button>
         <button onClick={() => deleteCourse(2)}>Delete</button>
         <button onClick={() => updateCourse(5, partialCourse)}>Update</button>
-        <button onClick={() => createCourseRequest("ukT6SG")}>Send Request</button>
+        <button onClick={() => createModule(1, module)}>Create module</button>
         <ul id="users">
-            {courses.map(course => <li key={course.id}>{course.author + course.name}</li>)}
+            {courses.map(course => <li key={course.id}>{course.author + course.name}
+                <Test2 id={course.id}/>
+            </li>)}
+        </ul>
+
+        <button onClick={() => createCourseRequest("1IuXdq")}>Send Request</button>
+        <button onClick={() => getRequestsForCourse(1)}>Get Requests (course 1)</button>
+        <button onClick={() => deleteCourseRequest(1, 5)}>Delete Request (course 1, request 5)</button>
+        <ul id="users">
+            {requests.map(request => <li key={request.id}>{request.id} - {request.student.email}</li>)}
         </ul>
     </div>
 }

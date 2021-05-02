@@ -1,11 +1,11 @@
 import {combineReducers} from "redux";
-import {userReducer} from "./userReducer";
 import {courseReducer} from "./courseReducer";
 import {requestReducer} from "./requestReducer";
+import {moduleReducer} from "./moduleReducer";
 
 export const rootReducer = combineReducers({
-    users: userReducer,
     courses: courseReducer,
+    modules: moduleReducer,
     requests: requestReducer
 })
 

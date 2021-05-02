@@ -30,10 +30,10 @@ export const deleteCourseRequest = (courseId: number, requestId: number) => {
     return async (dispatch: Dispatch<RequestAction>) => {
         try {
             dispatch({type: RequestActionTypes.DELETE_COURSE_REQUEST})
-            await authAxios.delete(`/courses/${courseId}/requests/${requestId}`)
+            await authAxios.delete(`/courses/${courseId}/requests/${requestId}/`)
             dispatch({type: RequestActionTypes.DELETE_COURSE_REQUEST_SUCCESS, courseId, requestId})
         } catch (error) {
-            dispatch({type: RequestActionTypes.DELETE_COURSE_REQUEST_ERROR, payload: {code: error.response.status, message: `Failed to delete request with ID ${requestId} for course with ID ${courseId}`}})
+            dispatch({type: RequestActionTypes.DELETE_COURSE_REQUEST_ERROR, payload: {code: error.response.status, message: `Failed to delete request for this course`}}) // TODO REMOVE ALL IDS FROM ERRORS
         }
     }
 }

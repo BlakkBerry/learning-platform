@@ -9,7 +9,7 @@ const initialState: CourseState = {
 
 export const courseReducer = (state = initialState, action: CourseAction): CourseState => {
     const setLoading = (): CourseState => ({...state, loading: true, error: null})
-    const setSuccess = (courses: Array<Course>): CourseState => ({...state, loading: false, error: null, courses: courses})
+    const setSuccess = (courses: Array<Course>): CourseState => ({...state, loading: false, error: null, courses})
     const setError = (error: RequestError): CourseState => ({...state, loading: false, error: error})
 
     switch (action.type) {

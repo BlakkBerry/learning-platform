@@ -1,9 +1,10 @@
 import {RequestError} from "./error";
+import {User} from "./user";
 
 export interface Request {
     id: number
-    student: any // TODO change type
-    code: string
+    student: User
+    code?: string
 }
 
 interface CreateCourseRequestAction {
