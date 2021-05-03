@@ -7,6 +7,11 @@ import Test2 from "./Test2";
 
 const TestComponent: React.FC = () => {
     const {courses, loading, error} = useTypedSelector(state => state.courses)
+    const materialState = useTypedSelector(state => state.materials)
+    const materials = materialState.courses
+    const materialsLoading = materialState.loading
+    const materialsError = materialState.error
+
     const requestState = useTypedSelector(state => state.requests)
     const requests = requestState.requests
     const requestsLoading = requestState.loading
@@ -21,7 +26,8 @@ const TestComponent: React.FC = () => {
         createCourseRequest,
         getRequestsForCourse,
         deleteCourseRequest,
-        createModule
+        createModule,
+        fetchMaterials
     } = useActions()
 
     const course: Course = {
@@ -43,9 +49,11 @@ const TestComponent: React.FC = () => {
     }
 
     useEffect(() => {
-        fetchCourses()
+        // fetchCourses()
+        fetchMaterials()
     }, [])
 
+    console.log(materials)
 
     if (loading || requestsLoading) {
         return <div style={{color: 'blue'}}>Loading...</div>
