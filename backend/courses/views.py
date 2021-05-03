@@ -1,83 +1,8 @@
 from django.db.models import Q
 from rest_framework import viewsets, permissions, status, mixins
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
 from .serializer import *
-
-
-@api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
-def get_all_student_courses(request):
-    user = request.user.id
-    author_courses = Course.objects.filter(students=user).order_by('id')
-
-    nested_courses = get_nested_courses(author_courses)
-
-    return Response(nested_courses)
-
-
-@api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
-def get_all_author_courses(request):
-    user = request.user.id
-    author_courses = Course.objects.filter(author=user).order_by('id')
-
-    nested_courses = get_nested_courses(author_courses)
-
-    return Response(nested_courses)
-
-
-def serialize(serializer, data, many=False):
-    data_serializer = serializer(data=data, many=many)
-    data_serializer.is_valid()
-    return data_serializer.data
-
-
-def get_nested_courses(courses):
-    serialized_courses = serialize(serializer=CourseSerializer, data=courses, many=True)
-
-    nested_courses = []
-
-    for idx, course in enumerate(courses):
-        serialized_course = serialized_courses[idx]
-        modules = Module.objects.filter(course=course)
-
-        common_modules = []
-
-        for module in modules:
-            serialized_module = serialize(serializer=ModuleSerializer, data=module)
-            lessons = Lesson.objects.filter(module=module)
-
-            common_lessons = []
-
-            for lesson in lessons:
-                serialized_lesson = serialize(LessonSerializer, lesson)
-                tasks = Task.objects.filter(lesson=lesson)
-
-                common_tasks = []
-
-                for task in tasks:
-                    serialized_task = serialize(serializer=TaskSerializer, data=task)
-                    home_tasks = HomeTask.objects.filter(assignment=task)
-
-                    serialized_task['home_tasks'] = serialize(serializer=HomeTaskSerializer, data=home_tasks, many=True)
-
-                    common_tasks.append(serialized_task)
-
-                serialized_lesson['tasks'] = common_tasks
-
-                common_lessons.append(serialized_lesson)
-
-            serialized_module['lessons'] = common_lessons
-
-            common_modules.append(serialized_module)
-
-        serialized_course['modules'] = common_modules
-
-        nested_courses.append(serialized_course)
-
-    return nested_courses
 
 
 class CourseAPI(viewsets.ModelViewSet):
@@ -606,3 +531,23 @@ class MarkAPI(viewsets.GenericViewSet, mixins.ListModelMixin):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class AllAuthorCoursesView(viewsets.GenericViewSet, mixins.ListModelMixin):
+    serializer_class = AllAuthorCoursesSerializer
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+
+    def get_queryset(self):
+        return Course.objects.filter(author=self.request.user)
+
+
+class AllStudentCoursesView(viewsets.GenericViewSet, mixins.ListModelMixin):
+    serializer_class = AllStudentCoursesSerializer
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+
+    def get_queryset(self):
+        return Course.objects.filter(students=self.request.user)

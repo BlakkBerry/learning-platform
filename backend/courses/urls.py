@@ -55,6 +55,6 @@ courses_url = [
 
 urlpatterns += [
     path('courses/', include(courses_url)),
-    path('get_student_bundle/', get_all_student_courses),
-    path('get_author_bundle/', get_all_author_courses)
+    path('get_student_bundle/', AllStudentCoursesView.as_view({'get': 'list'})),
+    path('get_author_bundle/', AllAuthorCoursesView.as_view({'get': 'list'}))
 ]

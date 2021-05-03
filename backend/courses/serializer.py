@@ -74,10 +74,13 @@ class TaskSerializer(serializers.ModelSerializer):
 
 
 class HomeTaskSerializer(serializers.ModelSerializer):
+    owner = CustomUserSerializer(many=False, read_only=True)
+
     class Meta:
         model = HomeTask
         fields = '__all__'
         read_only_fields = ('owner',)
+        depth = 1
 
     def validate_assignment(self, value):
         requested_user = self.context['request'].user.id
@@ -130,3 +133,81 @@ class MarkSerializer(serializers.ModelSerializer):
         model = Mark
         fields = '__all__'
         depth = 1
+
+
+class UserHomeTaskSerializer(HomeTaskSerializer):
+    class Meta:
+        model = HomeTask
+        exclude = ('assignment',)
+
+
+class UserTaskSetSerializer(serializers.ModelSerializer):
+    home_task = UserHomeTaskSerializer(many=True, read_only=True, source='hometask_set')
+
+    class Meta:
+        model = Task
+        fields = ['id', 'name', 'description', 'max_score', 'due_date', 'home_task']
+
+
+class UserLessonSetSerializer(serializers.ModelSerializer):
+    tasks = UserTaskSetSerializer(many=True, read_only=True, source='task_set')
+
+    class Meta:
+        model = Lesson
+        fields = ['id', 'name', 'description', 'created', 'tasks']
+        depth = 1
+
+
+class UserModuleSetSerializer(serializers.ModelSerializer):
+    lessons = UserLessonSetSerializer(many=True, read_only=True, source='lesson_set')
+
+    class Meta:
+        model = Module
+        fields = ['id', 'name', 'description', 'created', 'lessons']
+        depth = 1
+
+
+class AuthorModuleSerSerializer(UserModuleSetSerializer):
+    pass
+
+
+class StudentTaskSetSerializer(UserTaskSetSerializer):
+    home_task = serializers.SerializerMethodField('_get_user_home_tasks', source='hometask_set')
+
+    def _get_user_home_tasks(self, obj):
+        request = self.context.get('request', None)
+        if request:
+            home_task = HomeTask.objects.filter(owner=request.user, assignment=obj.id)
+            serializer = UserHomeTaskSerializer(instance=home_task, many=True)
+
+            return serializer.data
+
+
+class StudentLessonSetSerializer(UserLessonSetSerializer):
+    tasks = StudentTaskSetSerializer(many=True, read_only=True, source='task_set')
+
+
+class StudentModuleSerSerializer(UserModuleSetSerializer):
+    lessons = StudentLessonSetSerializer(many=True, read_only=True, source='lesson_set')
+
+
+class AllAuthorCoursesSerializer(serializers.ModelSerializer):
+    author = CustomUserSerializer(many=False, read_only=True)
+    students = CustomUserSerializer(many=True, read_only=True)
+    modules = AuthorModuleSerSerializer(many=True, read_only=True, source='module_set')
+
+    class Meta:
+        model = Course
+        fields = ['id', 'name', 'description', 'code', 'subject', 'section', 'audience', 'created', 'students',
+                  'author', 'modules']
+
+
+class AllStudentCoursesSerializer(serializers.ModelSerializer):
+    author = CustomUserSerializer(many=False, read_only=True)
+    students = CustomUserSerializer(many=True, read_only=True)
+    modules = StudentModuleSerSerializer(many=True, read_only=True, source='module_set')
+
+    class Meta:
+        model = Course
+        fields = ['id', 'name', 'description', 'code', 'subject', 'section', 'audience', 'created', 'students',
+                  'author', 'modules']
