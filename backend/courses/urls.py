@@ -12,7 +12,7 @@ urlpatterns = router.urls
 
 requests_url = [
     path('', CourseRequestAPI.as_view({'get': 'list'})),
-    path('<int:rpk>/', CourseRequestAPI.as_view({'get': 'retrieve', 'delete': 'destroy'})),
+    path('<int:rpk>/', CourseRequestAPI.as_view({'get': 'retrieve', 'delete': 'destroy', 'put': 'update'})),
 ]
 
 home_tasks_url = [

@@ -45,6 +45,12 @@ class CourseRequestSerializer(serializers.ModelSerializer):
         return value
 
 
+class CourseAuthorRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseRequest
+        fields = ''
+
+
 class ModuleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Module
@@ -167,7 +173,7 @@ class UserModuleSetSerializer(serializers.ModelSerializer):
         depth = 1
 
 
-class AuthorModuleSerSerializer(UserModuleSetSerializer):
+class AuthorModuleSetSerializer(UserModuleSetSerializer):
     pass
 
 
@@ -187,14 +193,14 @@ class StudentLessonSetSerializer(UserLessonSetSerializer):
     tasks = StudentTaskSetSerializer(many=True, read_only=True, source='task_set')
 
 
-class StudentModuleSerSerializer(UserModuleSetSerializer):
+class StudentModuleSetSerializer(UserModuleSetSerializer):
     lessons = StudentLessonSetSerializer(many=True, read_only=True, source='lesson_set')
 
 
 class AllAuthorCoursesSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(many=False, read_only=True)
     students = CustomUserSerializer(many=True, read_only=True)
-    modules = AuthorModuleSerSerializer(many=True, read_only=True, source='module_set')
+    modules = AuthorModuleSetSerializer(many=True, read_only=True, source='module_set')
 
     class Meta:
         model = Course
@@ -205,7 +211,7 @@ class AllAuthorCoursesSerializer(serializers.ModelSerializer):
 class AllStudentCoursesSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(many=False, read_only=True)
     students = CustomUserSerializer(many=True, read_only=True)
-    modules = StudentModuleSerSerializer(many=True, read_only=True, source='module_set')
+    modules = StudentModuleSetSerializer(many=True, read_only=True, source='module_set')
 
     class Meta:
         model = Course
