@@ -1,6 +1,8 @@
-from django.utils.crypto import get_random_string
-from users.models import CustomUser
 from django.db import models
+from django.utils.crypto import get_random_string
+from .validators import FileSizeValidator
+
+from users.models import CustomUser
 
 
 def get_random_hash():
@@ -60,6 +62,32 @@ class TaskBase(models.Model):
     description = models.TextField(null=True, blank=True)
 
 
+class ItemBase(models.Model):
+    title = models.CharField(max_length=250)
+    description = models.TextField(null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
+
+class Text(ItemBase):
+    content = models.TextField()
+
+
+class File(ItemBase):
+    file_item = models.FileField(upload_to='files', validators=[FileSizeValidator(5120)])
+
+
+class Image(ItemBase):
+    image_item = models.FileField(upload_to='images', validators=[FileSizeValidator(5120)])
+
+
+class Video(ItemBase):
+    url = models.URLField()
+
+
 class Task(TaskBase):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     max_score = models.IntegerField()
@@ -78,31 +106,36 @@ class HomeTask(TaskBase):
         return f'{self.assignment}__{self.name}'
 
 
-class ItemBase(models.Model):
-    title = models.CharField(max_length=250)
-    description = models.TextField(null=True, blank=True)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
-    task = models.ForeignKey(TaskBase, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.title
+class TaskText(Text):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
 
 
-class Text(ItemBase):
-    content = models.TextField()
+class TaskFile(File):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
 
 
-class File(ItemBase):
-    file_item = models.FileField(upload_to='files')
+class TaskImage(Image):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
 
 
-class Image(ItemBase):
-    image_item = models.FileField(upload_to='images')
+class TaskVideo(Video):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
 
 
-class Video(ItemBase):
-    url = models.URLField()
+class HomeTaskText(Text):
+    task = models.ForeignKey(HomeTask, on_delete=models.CASCADE)
+
+
+class HomeTaskFile(File):
+    task = models.ForeignKey(HomeTask, on_delete=models.CASCADE)
+
+
+class HomeTaskImage(Image):
+    task = models.ForeignKey(HomeTask, on_delete=models.CASCADE)
+
+
+class HomeTaskVideo(Video):
+    task = models.ForeignKey(HomeTask, on_delete=models.CASCADE)
 
 
 class Mark(models.Model):

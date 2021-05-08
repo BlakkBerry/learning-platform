@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres
+    container_name: learning_platform_db
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    expose:
+      - ${DB_PORT}
+    ports:
+      - ${DB_PORT}:5432
+    command: -p ${DB_PORT}
+  web:
+    build: .
+    container_name: learning_platform_django
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      - DB_HOST=postgres
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres

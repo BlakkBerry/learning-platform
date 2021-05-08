@@ -63,10 +63,39 @@ class LessonSerializer(serializers.ModelSerializer):
         exclude = ('module',)
 
 
+class TaskTextSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TaskText
+        exclude = ('task',)
+
+
+class TaskFileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TaskFile
+        exclude = ('task',)
+
+
+class TaskImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TaskImage
+        exclude = ('task',)
+
+
+class TaskVideoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TaskVideo
+        exclude = ('task',)
+
+
 class TaskSerializer(serializers.ModelSerializer):
+    text = TaskTextSerializer(many=True, read_only=True, source='tasktext_set')
+    file = TaskFileSerializer(many=True, read_only=True, source='taskfile_set')
+    image = TaskImageSerializer(many=True, read_only=True, source='taskimage_set')
+    video = TaskVideoSerializer(many=True, read_only=True, source='taskvideo_set')
+
     class Meta:
         model = Task
-        exclude = ('lesson',)
+        fields = ('id', 'name', 'description', 'max_score', 'due_date', 'text', 'file', 'image', 'video')
 
     def validate_due_date(self, value):
         if value < datetime.now().date():
@@ -79,57 +108,52 @@ class TaskSerializer(serializers.ModelSerializer):
         return value
 
 
+class HomeTaskTextSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HomeTaskText
+        exclude = ('task',)
+
+
+class HomeTaskFileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HomeTaskFile
+        exclude = ('task',)
+
+
+class HomeTaskImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HomeTaskImage
+        exclude = ('task',)
+
+
+class HomeTaskVideoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HomeTaskVideo
+        exclude = ('task',)
+
+
 class HomeTaskSerializer(serializers.ModelSerializer):
     owner = CustomUserSerializer(many=False, read_only=True)
+    text = HomeTaskTextSerializer(many=True, read_only=True, source='hometasktext_set')
+    file = HomeTaskFileSerializer(many=True, read_only=True, source='hometaskfile_set')
+    image = HomeTaskImageSerializer(many=True, read_only=True, source='hometaskimage_set')
+    video = HomeTaskVideoSerializer(many=True, read_only=True, source='hometaskvideo_set')
 
     class Meta:
         model = HomeTask
-        fields = '__all__'
+        fields = ('id', 'owner', 'name', 'mark', 'text', 'file', 'image', 'video',)
         read_only_fields = ('owner',)
-        depth = 1
-
-    def validate_assignment(self, value):
-        requested_user = self.context['request'].user.id
-        task = Task.objects.get(pk=value)
-        students = [student.id for student in task.lesson.module.course.students.all()]
-        if requested_user not in students and requested_user != task.lesson.module.course.author.id:
-            raise serializers.ValidationError('incorrect assignment')
-        return value
 
     def validate_mark(self, value):
-        requested_user = self.context['request'].user.id
-        task = Task.objects.get(pk=int(self.get_initial().get('assignment')))
+        requested_user = self.context['request'].user
+        task = Task.objects.get(pk=self.context.get('request').stream.resolver_match.kwargs['tpk'])
 
-        course_user = task.lesson.module.course.author.id
+        course_user = task.lesson.module.course.author
         if value is not None and (value < 0 or value > task.max_score):
             raise serializers.ValidationError('value must be in range [0, max score]')
         if value is not None and requested_user != course_user:
             raise serializers.ValidationError("you can't judge yourself")
         return value
-
-
-class TextSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Text
-        fields = '__all__'
-
-
-class FileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = File
-        fields = '__all__'
-
-
-class ImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Image
-        fields = '__all__'
-
-
-class VideoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Video
-        fields = '__all__'
 
 
 class MarkSerializer(serializers.ModelSerializer):
@@ -142,17 +166,22 @@ class MarkSerializer(serializers.ModelSerializer):
 
 
 class UserHomeTaskSerializer(HomeTaskSerializer):
+    text = None
+    file = None
+    image = None
+    video = None
+
     class Meta:
         model = HomeTask
         exclude = ('assignment',)
 
 
-class UserTaskSetSerializer(serializers.ModelSerializer):
+class UserTaskSetSerializer(TaskSerializer):
     home_task = UserHomeTaskSerializer(many=True, read_only=True, source='hometask_set')
 
     class Meta:
         model = Task
-        fields = ['id', 'name', 'description', 'max_score', 'due_date', 'home_task']
+        fields = ('id', 'name', 'description', 'max_score', 'due_date', 'home_task')
 
 
 class UserLessonSetSerializer(serializers.ModelSerializer):
@@ -160,7 +189,7 @@ class UserLessonSetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Lesson
-        fields = ['id', 'name', 'description', 'created', 'tasks']
+        fields = ('id', 'name', 'description', 'created', 'tasks')
         depth = 1
 
 
@@ -169,7 +198,7 @@ class UserModuleSetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Module
-        fields = ['id', 'name', 'description', 'created', 'lessons']
+        fields = ('id', 'name', 'description', 'created', 'lessons')
         depth = 1
 
 
@@ -204,8 +233,8 @@ class AllAuthorCoursesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ['id', 'name', 'description', 'code', 'subject', 'section', 'audience', 'created', 'students',
-                  'author', 'modules']
+        fields = ('id', 'name', 'description', 'code', 'subject', 'section', 'audience', 'created', 'students',
+                  'author', 'modules')
 
 
 class AllStudentCoursesSerializer(serializers.ModelSerializer):
@@ -215,5 +244,5 @@ class AllStudentCoursesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ['id', 'name', 'description', 'code', 'subject', 'section', 'audience', 'created', 'students',
-                  'author', 'modules']
+        fields = ('id', 'name', 'description', 'code', 'subject', 'section', 'audience', 'created', 'students',
+                  'author', 'modules')
