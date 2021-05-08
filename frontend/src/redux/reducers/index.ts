@@ -1,14 +1,18 @@
 import {combineReducers} from "redux";
-import {courseReducer} from "./courseReducer";
 import {requestReducer} from "./requestReducer";
+import {courseReducer} from "./courseReducer";
 import {moduleReducer} from "./moduleReducer";
-import {materialReducer} from "./materialReducer";
+import {lessonReducer} from "./lessonReducer";
+import {taskReducer} from "./taskReducer";
+import {homeTaskReducer} from "./homeTaskReducer";
 
 export const rootReducer = combineReducers({
     courses: courseReducer,
     modules: moduleReducer,
-    requests: requestReducer,
-    materials: materialReducer
+    lessons: lessonReducer,
+    tasks: taskReducer,
+    homeTasks: homeTaskReducer,
+    requests: requestReducer
 })
 
 export type RootState = ReturnType<typeof rootReducer>

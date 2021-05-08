@@ -1,63 +1,105 @@
 import {RequestError} from "./error";
+import {Lesson} from "./lesson";
+import {Loadable, Throwable} from "./common";
 
 export interface Module {
     id?: number
     name: string
     description: string
     created?: Date
+    lessons?: Array<Lesson>
 }
 
-interface CreateModuleAction {
-    type: ModuleActionTypes.CREATE_MODULE
+interface FetchModulesAction extends Loadable {
+    type: ModuleActionTypes.FETCH_MODULES
+}
+interface FetchModulesSuccessAction {
+    type: ModuleActionTypes.FETCH_MODULES_SUCCESS,
+    payload: Array<Module>
+}
+interface FetchModulesErrorAction extends Throwable {
+    type: ModuleActionTypes.FETCH_MODULES_ERROR,
+    payload: RequestError
+}
+
+interface CreateModuleAction extends Loadable {
+    type: ModuleActionTypes.CREATE_MODULE,
 }
 interface CreateModuleSuccessAction {
     type: ModuleActionTypes.CREATE_MODULE_SUCCESS
     payload: Module
     courseId: number
 }
-interface CreateModuleErrorAction {
+interface CreateModuleErrorAction extends Throwable {
     type: ModuleActionTypes.CREATE_MODULE_ERROR
-    payload: RequestError
+    payload: RequestError,
 }
 
-interface GetModulesForCourse {
-    type: ModuleActionTypes.GET_MODULES_FOR_COURSE
+interface UpdateModuleAction extends Loadable {
+    type: ModuleActionTypes.UPDATE_MODULE,
 }
-interface GetModulesForCourseSuccess {
-    type: ModuleActionTypes.GET_MODULES_FOR_COURSE_SUCCESS
-    payload: Array<Module>
+interface UpdateModuleSuccessAction {
+    type: ModuleActionTypes.UPDATE_MODULE_SUCCESS
+    payload: Module
     courseId: number
+    moduleId: number
 }
-interface GetModulesForCourseError {
-    type: ModuleActionTypes.GET_MODULES_FOR_COURSE_ERROR
+interface UpdateModuleErrorAction extends Throwable {
+    type: ModuleActionTypes.UPDATE_MODULE_ERROR
     payload: RequestError
 }
 
-export interface ModulesInCourse {
-    [key: number]: Array<Module>
+interface DeleteModuleAction extends Loadable {
+    type: ModuleActionTypes.DELETE_MODULE,
 }
-
-export interface ModuleState {
-    modules: ModulesInCourse
-    loading: boolean
-    error: RequestError | null
+interface DeleteModuleSuccessAction {
+    type: ModuleActionTypes.DELETE_MODULE_SUCCESS
+    courseId: number
+    moduleId: number
+}
+interface DeleteModuleErrorAction extends Throwable {
+    type: ModuleActionTypes.DELETE_MODULE_ERROR
+    payload: RequestError
 }
 
 export enum ModuleActionTypes {
 
-    GET_MODULES_FOR_COURSE = 'MODULES/GET_MODULES_FOR_COURSE',
-    GET_MODULES_FOR_COURSE_SUCCESS = 'MODULES/GET_MODULES_FOR_COURSE_SUCCESS',
-    GET_MODULES_FOR_COURSE_ERROR = 'MODULES/GET_MODULES_FOR_COURSE_ERROR',
+    FETCH_MODULES = 'MODULES/FETCH_MODULES',
+    FETCH_MODULES_SUCCESS = 'MODULES/FETCH_MODULES_SUCCESS',
+    FETCH_MODULES_ERROR = 'MODULES/FETCH_MODULES_ERROR',
 
     CREATE_MODULE = 'MODULES/CREATE_MODULE',
     CREATE_MODULE_SUCCESS = 'MODULES/CREATE_MODULE_SUCCESS',
     CREATE_MODULE_ERROR = 'MODULES/CREATE_MODULE_ERROR',
+
+    UPDATE_MODULE = 'MODULES/UPDATE_MODULE',
+    UPDATE_MODULE_SUCCESS = 'MODULES/UPDATE_MODULE_SUCCESS',
+    UPDATE_MODULE_ERROR = 'MODULES/UPDATE_MODULE_ERROR',
+
+    DELETE_MODULE = 'MODULES/DELETE_MODULE',
+    DELETE_MODULE_SUCCESS = 'MODULES/DELETE_MODULE_SUCCESS',
+    DELETE_MODULE_ERROR = 'MODULES/DELETE_MODULE_ERROR',
+}
+
+export interface ModuleState {
+    modules: Array<Module>
+    loading: boolean
+    error: RequestError | null
 }
 
 export type ModuleAction =
+    FetchModulesAction |
+    FetchModulesSuccessAction |
+    FetchModulesErrorAction |
+
     CreateModuleAction |
     CreateModuleSuccessAction |
     CreateModuleErrorAction |
-    GetModulesForCourse |
-    GetModulesForCourseSuccess |
-    GetModulesForCourseError
+
+    UpdateModuleAction |
+    UpdateModuleSuccessAction |
+    UpdateModuleErrorAction |
+
+    DeleteModuleAction |
+    DeleteModuleSuccessAction |
+    DeleteModuleErrorAction

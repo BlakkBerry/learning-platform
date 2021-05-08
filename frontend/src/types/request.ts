@@ -1,5 +1,6 @@
 import {RequestError} from "./error";
 import {User} from "./user";
+import {Loadable, Throwable} from "./common";
 
 export interface Request {
     id: number
@@ -7,72 +8,51 @@ export interface Request {
     code?: string
 }
 
-interface CreateCourseRequestAction {
+interface FetchCourseRequestsAction extends Loadable {
+    type: RequestActionTypes.FETCH_COURSE_REQUESTS
+}
+interface FetchCourseRequestsSuccessAction {
+    type: RequestActionTypes.FETCH_COURSE_REQUESTS_SUCCESS,
+    payload: Array<Request>,
+}
+interface FetchCourseRequestsErrorAction extends Throwable {
+    type: RequestActionTypes.FETCH_COURSE_REQUESTS_ERROR,
+    payload: RequestError
+}
+
+interface CreateCourseRequestAction extends Loadable {
     type: RequestActionTypes.CREATE_COURSE_REQUEST
 }
 interface CreateCourseRequestSuccessAction {
     type: RequestActionTypes.CREATE_COURSE_REQUEST_SUCCESS,
     payload: Request
 }
-interface CreateCourseRequestErrorAction {
+interface CreateCourseRequestErrorAction extends Throwable {
     type: RequestActionTypes.CREATE_COURSE_REQUEST_ERROR
-    payload: RequestError
-}
-
-interface GetRequestsForCourse {
-    type: RequestActionTypes.GET_REQUESTS_FOR_COURSE
-}
-interface GetRequestsForCourseSuccess {
-    type: RequestActionTypes.GET_REQUESTS_FOR_COURSE_SUCCESS,
-    courseId: number
-    payload: Array<Request>,
-}
-interface GetRequestsForCourseError {
-    type: RequestActionTypes.GET_REQUESTS_FOR_COURSE_ERROR,
-    payload: RequestError
-}
-
-interface DeleteCourseRequest {
-    type: RequestActionTypes.DELETE_COURSE_REQUEST
-}
-interface DeleteCourseRequestSuccess {
-    type: RequestActionTypes.DELETE_COURSE_REQUEST_SUCCESS,
-    courseId: number,
-    requestId: number
-}
-interface DeleteCourseRequestError {
-    type: RequestActionTypes.DELETE_COURSE_REQUEST_ERROR,
     payload: RequestError
 }
 
 export interface RequestState {
     requests: Array<Request>
-    courseId: number | null
     loading: boolean
     error: RequestError | null
 }
 
 export enum RequestActionTypes {
+
+    FETCH_COURSE_REQUESTS = 'REQUESTS/FETCH_COURSE_REQUESTS',
+    FETCH_COURSE_REQUESTS_SUCCESS = 'REQUESTS/FETCH_COURSE_REQUESTS',
+    FETCH_COURSE_REQUESTS_ERROR = 'REQUESTS/FETCH_COURSE_REQUESTS',
+
     CREATE_COURSE_REQUEST = 'REQUESTS/CREATE_COURSE_REQUEST',
     CREATE_COURSE_REQUEST_SUCCESS = 'REQUESTS/CREATE_COURSE_REQUEST_SUCCESS',
-    CREATE_COURSE_REQUEST_ERROR = 'REQUESTS/CREATE_COURSE_REQUEST_ERROR',
-
-    GET_REQUESTS_FOR_COURSE = 'REQUESTS/GET_REQUESTS_FOR_COURSE',
-    GET_REQUESTS_FOR_COURSE_SUCCESS = 'REQUESTS/GET_REQUESTS_FOR_COURSE_SUCCESS',
-    GET_REQUESTS_FOR_COURSE_ERROR = 'REQUESTS/GET_REQUESTS_FOR_COURSE_ERROR',
-
-    DELETE_COURSE_REQUEST = 'REQUESTS/DELETE_COURSE_REQUEST',
-    DELETE_COURSE_REQUEST_SUCCESS = 'REQUESTS/DELETE_COURSE_REQUEST_SUCCESS',
-    DELETE_COURSE_REQUEST_ERROR = 'REQUESTS/DELETE_COURSE_REQUEST_ERROR'
+    CREATE_COURSE_REQUEST_ERROR = 'REQUESTS/CREATE_COURSE_REQUEST_ERROR'
 }
 
 export type RequestAction =
     CreateCourseRequestAction |
     CreateCourseRequestSuccessAction |
     CreateCourseRequestErrorAction |
-    GetRequestsForCourse |
-    GetRequestsForCourseSuccess |
-    GetRequestsForCourseError |
-    DeleteCourseRequest |
-    DeleteCourseRequestSuccess |
-    DeleteCourseRequestError
+    FetchCourseRequestsAction |
+    FetchCourseRequestsSuccessAction |
+    FetchCourseRequestsErrorAction

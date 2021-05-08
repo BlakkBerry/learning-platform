@@ -1,11 +1,15 @@
 import * as CourseActions from './course'
 import * as CourseRequestActions from './request'
 import * as ModuleActions from './module'
-import * as MaterialActions from './material'
+import * as LessonAction from './lesson'
+import * as TaskAction from './task'
+import * as HomeTaskAction from './hometask'
 
 export const Actions = {
     ...CourseActions,
     ...CourseRequestActions,
     ...ModuleActions,
-    ...MaterialActions
+    ...LessonAction,
+    ...TaskAction,
+    ...HomeTaskAction
 }

@@ -1,4 +1,7 @@
 import {RequestError} from "./error";
+import {User} from "./user";
+import {Module} from "./module";
+import {Loadable, Throwable} from "./common";
 
 export interface Course {
     id?: number
@@ -10,67 +13,85 @@ export interface Course {
     audience?: string
     created?: Date
     author?: number
-    students: Array<any> // TODO Change type
+    students: Array<User>
+    modules?: Array<Module>
 }
 
-interface FetchCoursesAction {
-    type: CourseActionTypes.FETCH_COURSES
+interface FetchStudentCoursesAction extends Loadable {
+    type: CourseActionTypes.FETCH_STUDENT_COURSES
 }
-interface FetchCoursesSuccessAction {
-    type: CourseActionTypes.FETCH_COURSES_SUCCESS
+interface FetchStudentCoursesSuccessAction {
+    type: CourseActionTypes.FETCH_STUDENT_COURSES_SUCCESS
     payload: Array<Course>
 }
-interface FetchCoursesErrorAction {
-    type: CourseActionTypes.FETCH_COURSES_ERROR
+interface FetchStudentCoursesErrorAction extends Throwable {
+    type: CourseActionTypes.FETCH_STUDENT_COURSES_ERROR,
     payload: RequestError
 }
 
-interface CreateCourseAction {
-    type: CourseActionTypes.CREATE_SINGLE_COURSE
+interface FetchAuthorCoursesAction extends Loadable {
+    type: CourseActionTypes.FETCH_AUTHOR_COURSES,
+}
+interface FetchAuthorCoursesSuccessAction {
+    type: CourseActionTypes.FETCH_AUTHOR_COURSES_SUCCESS
+    payload: Array<Course>
+}
+interface FetchAuthorCoursesErrorAction extends Throwable {
+    type: CourseActionTypes.FETCH_AUTHOR_COURSES_ERROR
+    payload: RequestError,
+}
+
+interface CreateCourseAction extends Loadable {
+    type: CourseActionTypes.CREATE_SINGLE_COURSE,
 }
 interface CreateCourseSuccessAction {
     type: CourseActionTypes.CREATE_SINGLE_COURSE_SUCCESS,
     payload: Course
 }
-interface CreateCourseErrorAction {
+interface CreateCourseErrorAction extends Throwable {
     type: CourseActionTypes.CREATE_SINGLE_COURSE_ERROR
-    payload: RequestError
+    payload: RequestError,
 }
 
-interface UpdateCourseAction {
-    type: CourseActionTypes.UPDATE_SINGLE_COURSE
+interface UpdateCourseAction extends Loadable {
+    type: CourseActionTypes.UPDATE_SINGLE_COURSE,
 }
 interface UpdateCourseSuccessAction {
     type: CourseActionTypes.UPDATE_SINGLE_COURSE_SUCCESS
     payload: Course
 }
-interface UpdateCourseErrorAction {
+interface UpdateCourseErrorAction extends Throwable {
     type: CourseActionTypes.UPDATE_SINGLE_COURSE_ERROR
-    payload: RequestError
+    payload: RequestError,
 }
 
-interface DeleteCourseAction {
-    type: CourseActionTypes.DELETE_SINGLE_COURSE
+interface DeleteCourseAction extends Loadable {
+    type: CourseActionTypes.DELETE_SINGLE_COURSE,
 }
 interface DeleteCourseSuccessAction {
     type: CourseActionTypes.DELETE_SINGLE_COURSE_SUCCESS,
     payload: number
 }
-interface DeleteCourseErrorAction {
+interface DeleteCourseErrorAction extends Throwable {
     type: CourseActionTypes.DELETE_SINGLE_COURSE_ERROR
-    payload: RequestError
+    payload: RequestError,
 }
 
 export interface CourseState {
-    courses: Array<Course>
+    studentCourses: Array<Course>,
+    authorCourses: Array<Course>,
     loading: boolean
     error: RequestError | null
 }
 
 export enum CourseActionTypes {
-    FETCH_COURSES = 'COURSES/FETCH_COURSES',
-    FETCH_COURSES_SUCCESS = 'COURSES/FETCH_COURSES_SUCCESS',
-    FETCH_COURSES_ERROR = 'COURSES/FETCH_COURSES_ERROR',
+    FETCH_STUDENT_COURSES = 'MATERIAL/FETCH_STUDENT_COURSES',
+    FETCH_STUDENT_COURSES_SUCCESS = 'MATERIAL/FETCH_STUDENT_COURSES_SUCCESS',
+    FETCH_STUDENT_COURSES_ERROR = 'MATERIAL/FETCH_STUDENT_COURSES_ERROR',
+
+    FETCH_AUTHOR_COURSES = 'MATERIAL/FETCH_AUTHOR_COURSES',
+    FETCH_AUTHOR_COURSES_SUCCESS = 'MATERIAL/FETCH_AUTHOR_COURSES_SUCCESS',
+    FETCH_AUTHOR_COURSES_ERROR = 'MATERIAL/FETCH_AUTHOR_COURSES_ERROR',
 
     CREATE_SINGLE_COURSE = 'COURSES/CRATE_SINGLE_COURSE',
     CREATE_SINGLE_COURSE_SUCCESS = 'COURSES/CRATE_SINGLE_COURSE_SUCCESS',
@@ -86,15 +107,22 @@ export enum CourseActionTypes {
 }
 
 export type CourseAction =
-    FetchCoursesAction |
-    FetchCoursesSuccessAction |
-    FetchCoursesErrorAction |
+    FetchStudentCoursesAction |
+    FetchStudentCoursesSuccessAction |
+    FetchStudentCoursesErrorAction |
+
+    FetchAuthorCoursesAction |
+    FetchAuthorCoursesSuccessAction |
+    FetchAuthorCoursesErrorAction |
+
     CreateCourseAction |
     CreateCourseSuccessAction |
     CreateCourseErrorAction |
+
     UpdateCourseAction |
     UpdateCourseSuccessAction |
     UpdateCourseErrorAction |
+
     DeleteCourseAction |
     DeleteCourseSuccessAction |
     DeleteCourseErrorAction

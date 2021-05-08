@@ -1,12 +1,11 @@
 import React, {useEffect} from 'react';
 import {useTypedSelector} from "../../../hooks/useTypedSelector";
-import {useActions} from "../../../hooks/useActions";
 
 const LoginPage = () => {
 
     useTypedSelector(state => {
-        console.log(state.materials.courses.length)
-        return state.materials
+        console.log(state.courses.authorCourses.length)
+        return state.courses
     })
 
     useEffect(() => {
