@@ -46,15 +46,16 @@ class CourseAPI(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class CourseRequestAPI(viewsets.GenericViewSet,
-                       mixins.ListModelMixin,
-                       mixins.RetrieveModelMixin,
-                       mixins.DestroyModelMixin,
-                       mixins.CreateModelMixin):
-    serializer_class = CourseRequestSerializer
+class CourseRequestAPI(viewsets.ModelViewSet):
     permission_classes = [
         permissions.IsAuthenticated
     ]
+
+    def get_serializer_class(self):
+        if self.action != 'update':
+            return CourseRequestSerializer
+        else:
+            return CourseAuthorRequestSerializer
 
     def get_queryset(self):
         user = self.request.user.id
@@ -77,6 +78,17 @@ class CourseRequestAPI(viewsets.GenericViewSet,
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        instance = get_object_or_404(CourseRequest, course__pk=kwargs['pk'], pk=kwargs['rpk'])
+
+        if self.request.user == instance.course.author:
+            instance.course.students.add(instance.student)
+            instance.course.save()
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
