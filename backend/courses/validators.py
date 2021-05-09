@@ -12,7 +12,6 @@ class FileSizeValidator(object):
             :param size_kb: int, >0:
         """
         if type(size_kb) != int:
-            print(type(size_kb))
             raise TypeError('Argument must be integer')
 
         if size_kb <= 0:

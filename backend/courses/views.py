@@ -1,3 +1,6 @@
+import os
+
+from django.conf import settings
 from django.db.models import Q
 from rest_framework import viewsets, permissions, status, mixins
 from rest_framework.response import Response
@@ -614,11 +617,16 @@ class TaskItemBaseAPI(viewsets.ModelViewSet):
                                 data={'detail': 'Authentication credentials were not provided.'})
             else:
                 return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
-        self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+
+        file_path = os.path.join(settings.BASE_DIR, str(instance.file_item))
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class HomeTaskItemBaseAPI(TaskItemBaseAPI):
+class HomeTaskItemBaseAPI(viewsets.ModelViewSet):
     base_model = ItemBase
 
     def get_queryset(self):
@@ -747,8 +755,12 @@ class HomeTaskItemBaseAPI(TaskItemBaseAPI):
                             data={'detail': 'Only students can delete files to homeworks.'})
 
         if user in students and instance.task.owner == user:
-            self.perform_destroy(instance)
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            file_path = os.path.join(settings.BASE_DIR, str(instance.file_item))
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                self.perform_destroy(instance)
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
 
 
