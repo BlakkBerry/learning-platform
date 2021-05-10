@@ -29,3 +29,5 @@ win32-setctime==1.0.3
 drf-yasg==1.20.0
 knox==0.1.11
 python-magic==0.4.22
+django-heroku>=0.3.1
+whitenoise==5.2.0
