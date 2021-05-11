@@ -6,7 +6,7 @@ import AuthLayout from "./Auth/AuthLayout";
 import LoginPage from "./Auth/LoginPage/LoginPage";
 import SignupPage from "./Auth/SignupPage/SignupPage";
 import Progress from "./Main/Homepage/Progess/Progress";
-import Files from "./Main/Homepage/Files/Files";
+import Files from "./Main/Homepage/CourseFiles/Files";
 import CoursePage from "./Main/Homepage/Courses/CoursePage";
 import ModulePage from "./Main/Homepage/Courses/Modules/ModulePage";
 import LessonPage from "./Main/Homepage/Courses/Modules/Lessons/LessonPage";
