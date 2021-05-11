@@ -6,9 +6,10 @@ const Homepage = () => {
 
     return (
         <div>
-            Homepage!
-            <Test/>
-            <Courses/>
+            {/*<Test/>*/}
+            <Courses isAuthor={false}/>
+
+            <Courses isAuthor={true}/>
         </div>
     );
 };

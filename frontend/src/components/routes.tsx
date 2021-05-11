@@ -5,6 +5,11 @@ import NotFoundPage from "./Main/NotFound/NotFoundPage";
 import AuthLayout from "./Auth/AuthLayout";
 import LoginPage from "./Auth/LoginPage/LoginPage";
 import SignupPage from "./Auth/SignupPage/SignupPage";
+import Progress from "./Main/Homepage/Progess/Progress";
+import Files from "./Main/Homepage/Files/Files";
+import CoursePage from "./Main/Homepage/Courses/CoursePage";
+import ModulePage from "./Main/Homepage/Courses/Modules/ModulePage";
+import LessonPage from "./Main/Homepage/Courses/Modules/Lessons/LessonPage";
 
 type Route = {
     path: string
@@ -24,13 +29,47 @@ const routes: Array<Route> = [
         layout: MainLayout
     },
     {
+        path: '/courses/:id',
+        exact: true,
+        name: 'Course',
+        component: CoursePage,
+        layout: MainLayout
+    },
+    {
+        path: '/courses/:courseId/modules/:id',
+        exact: true,
+        name: 'Module',
+        component: ModulePage,
+        layout: MainLayout
+    },
+    {
+        path: '/courses/:courseId/modules/:moduleId/lessons/:id',
+        exact: true,
+        name: 'Lesson',
+        component: LessonPage,
+        layout: MainLayout
+    },
+    {
+        path: '/progress',
+        exact: true,
+        name: 'Progress',
+        component: Progress,
+        layout: MainLayout
+    },
+    {
+        path: '/files',
+        exact: true,
+        name: 'Files',
+        component: Files,
+        layout: MainLayout
+    },
+    {
         path: '/notfound',
         exact: true,
         name: 'Page not found',
         component: NotFoundPage,
         layout: MainLayout
     },
-
 
 
     // Auth

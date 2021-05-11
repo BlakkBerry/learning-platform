@@ -1,11 +1,10 @@
 import React from 'react';
+import {Lesson} from "../../../../../../../types/lesson";
+import {Card} from "antd";
 import {DesktopOutlined, FileOutlined, RiseOutlined} from "@ant-design/icons";
 import {Meta} from "antd/es/list/Item";
-import {Card} from "antd";
-import './Course.css'
 
-const Course = (course: any) => {
-
+const LessonItem = (lesson: Lesson) => {
     return (
         <Card
             hoverable
@@ -13,7 +12,7 @@ const Course = (course: any) => {
                 <img
                     className="card__image"
                     height={200}
-                    alt={course.name}
+                    alt={lesson.name}
                     src={'https://i.stack.imgur.com/y9DpT.jpg'}
                 />
             }
@@ -24,11 +23,11 @@ const Course = (course: any) => {
             ]}
         >
             <Meta
-                title={course.name}
-                description="This is the description"
+                title={lesson.name}
+                description={lesson.description}
             />
         </Card>
     );
 };
 
-export default Course;
+export default LessonItem;
