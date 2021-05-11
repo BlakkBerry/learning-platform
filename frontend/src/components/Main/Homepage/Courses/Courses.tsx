@@ -1,45 +1,41 @@
-import React from 'react';
-import {List} from "antd";
+import React, {FC, useEffect} from 'react';
+import {List, Spin} from "antd";
 import Course from "./Course/Course";
+import {useTypedSelector} from "../../../../hooks/useTypedSelector";
+import {useActions} from "../../../../hooks/useActions";
+import './Courses.css'
+import {Link} from "react-router-dom"
 
-const Courses = () => {
+interface CoursesProps {
+    isAuthor: boolean
+}
 
-    const data = [
-        {
-            title: 'Title 1',
-            image: 'https://ru.react.js.org/logo-og.png'
-        },
-        {
-            title: 'Title 2',
-            image: 'https://cdn-images-1.medium.com/max/2000/1*qXcjSfRj0C0ir2yMsYiRyw.jpeg'
-        },
-        {
-            title: 'Title 3'
-        },
-        {
-            title: 'Title 4',
-            image: 'https://cdn-images-1.medium.com/max/2000/1*qXcjSfRj0C0ir2yMsYiRyw.jpeg'
-        },
-        {
-            title: 'Title 5',
-            image: 'https://ru.react.js.org/logo-og.png'
-        },
-        {
-            title: 'Title 6',
-            image: 'https://cdn-images-1.medium.com/max/2000/1*qXcjSfRj0C0ir2yMsYiRyw.jpeg'
-        },
-        {
-            title: 'Title 7'
-        },
-        {
-            title: 'Title 8',
-            image: 'https://cdn-images-1.medium.com/max/2000/1*qXcjSfRj0C0ir2yMsYiRyw.jpeg'
+const Courses: FC<CoursesProps> = ({isAuthor}) => {
+
+    const {authorCourses, studentCourses, loading, error} = useTypedSelector(state => state.courses)
+    const {fetchAuthorMaterials, fetchStudentCourses} = useActions()
+
+    useEffect(() => {
+        if (isAuthor) {
+            fetchAuthorMaterials()
+        } else {
+            fetchStudentCourses()
         }
-    ];
+    }, [])
 
+
+    if (error) {
+        return <h1 color="red">{error}</h1>
+    }
+
+    if (loading) {
+        return <div className="spinner">
+            <Spin/>
+        </div>
+    }
 
     return <>
-        <h1 style={{textAlign: 'center', fontSize: '2rem'}}>Courses</h1>
+        <h1 style={{textAlign: 'center', fontSize: '2rem'}}>{isAuthor ? 'Created Courses' : 'My Courses'}</h1>
         <List
             grid={{
                 gutter: 16,
@@ -50,10 +46,12 @@ const Courses = () => {
                 xl: 4,
                 xxl: 4
             }}
-            dataSource={data}
+            dataSource={isAuthor ? authorCourses : studentCourses}
             renderItem={course => (
                 <List.Item>
-                    <Course {...course}/>
+                    <Link to={`/courses/${course.id}`}>
+                        <Course {...course}/>
+                    </Link>
                 </List.Item>
             )}
         />

@@ -50,10 +50,10 @@ const TestComponent: React.FC = () => {
 
     useEffect(() => {
         fetchAuthorMaterials()
-        fetchModules(1)
-        fetchLessons(1, 1)
-        fetchTasks(1, 1, 1)
-        fetchHomeTasks(1, 1, 1, 1)
+        // fetchModules(1)
+        // fetchLessons(1, 1)
+        // fetchTasks(1, 1, 1)
+        // fetchHomeTasks(1, 1, 1, 1)
     }, [])
 
     if (loading) {

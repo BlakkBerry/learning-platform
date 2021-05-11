@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Layout, Menu} from "antd";
 import {
     DesktopOutlined, FileOutlined,
@@ -8,54 +8,59 @@ import {
     SnippetsOutlined,
     UserOutlined
 } from "@ant-design/icons";
+import {useTypedSelector} from "../../../hooks/useTypedSelector";
+import {useActions} from "../../../hooks/useActions";
+import {Link} from "react-router-dom"
+
 const {Sider} = Layout;
 const {SubMenu} = Menu;
 
 const Sidebar = () => {
     const [collapsed, setCollapsed] = useState(false);
+    const {authorCourses, studentCourses, loading, error} = useTypedSelector(state => state.courses)
+    const {fetchAuthorMaterials} = useActions()
+
+    useEffect(() => {
+        fetchAuthorMaterials()
+    }, [])
 
     return (
         <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
             <div className="logo"/>
-            <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
+            <Menu theme="dark" mode="inline" selectable={false}>
                 <Menu.Item key="2" icon={<DesktopOutlined/>}>
-                    Home
+                    <Link to="" style={{textDecoration: 'none'}}>
+                        Home
+                    </Link>
                 </Menu.Item>
                 <Menu.Item key="1" icon={<RiseOutlined/>}>
-                    Progress
+                    <Link to="progress" style={{textDecoration: 'none'}}>
+                        Progress
+                    </Link>
                 </Menu.Item>
 
-                <SubMenu key="sub1" icon={<UserOutlined/>} title="User">
-                    <Menu.Item key="3">Tom</Menu.Item>
-                    <Menu.Item key="4">Bill</Menu.Item>
-                    <Menu.Item key="5">Alex</Menu.Item>
-                </SubMenu>
+                {/*<SubMenu key="sub1" icon={<UserOutlined/>} title="User">*/}
+                {/*    <Menu.Item key="3">Tom</Menu.Item>*/}
+                {/*    <Menu.Item key="4">Bill</Menu.Item>*/}
+                {/*    <Menu.Item key="5">Alex</Menu.Item>*/}
+                {/*</SubMenu>*/}
                 <SubMenu key="courses" icon={<ScheduleOutlined/>} title="My Courses">
-                    <SubMenu key="courses/1/modules" icon={<ProfileOutlined/>} title="Course 1">
-                        <SubMenu key="courses/1/modules/1/lessons" icon={<SnippetsOutlined/>} title="Module 1">
-                            <Menu.Item key="courses/1/modules/1/lessons/1">Lesson 1</Menu.Item>
-                            <Menu.Item key="courses/1/modules/1/lessons/2">Lesson 2</Menu.Item>
-                            <Menu.Item key="courses/1/modules/1/lessons/3">Lesson 3</Menu.Item>
+                    {authorCourses.map(course =>
+                        <SubMenu key={course.id} icon={<ProfileOutlined/>} title={course.name}>
+                            {course.modules?.map(module =>
+                                <SubMenu key={module.id} icon={<SnippetsOutlined/>} title={module.name}>
+                                    {module.lessons?.map(lesson =>
+                                        <Menu.Item key={lesson.id}>Lesson 1</Menu.Item>
+                                    )}
+                                </SubMenu>
+                            )}
                         </SubMenu>
-                        <SubMenu key="courses/1/modules/2/lessons" icon={<SnippetsOutlined/>} title="Module 2">
-                            <Menu.Item key="courses/1/modules/2/lessons/1">Lesson 1</Menu.Item>
-                            <Menu.Item key="courses/1/modules/2/lessons/2">Lesson 2</Menu.Item>
-                        </SubMenu>
-                    </SubMenu>
-                    <SubMenu key="courses/2/modules" icon={<ProfileOutlined/>} title="Course 1">
-                        <SubMenu key="courses/2/modules/1/lessons" icon={<SnippetsOutlined/>} title="Module 1">
-                            <Menu.Item key="courses/2/modules/1/lessons/1">Lesson 1</Menu.Item>
-                            <Menu.Item key="courses/2/modules/1/lessons/2">Lesson 2</Menu.Item>
-                            <Menu.Item key="courses/2/modules/1/lessons/3">Lesson 3</Menu.Item>
-                        </SubMenu>
-                        <SubMenu key="courses/2/modules/2/lessons" icon={<SnippetsOutlined/>} title="Module 2">
-                            <Menu.Item key="courses/2/modules/2/lessons/1">Lesson 1</Menu.Item>
-                            <Menu.Item key="courses/2/modules/2/lessons/2">Lesson 2</Menu.Item>
-                        </SubMenu>
-                    </SubMenu>
+                    )}
                 </SubMenu>
                 <Menu.Item key="9" icon={<FileOutlined/>}>
-                    Files
+                    <Link to="files" style={{textDecoration: 'none'}}>
+                        Files
+                    </Link>
                 </Menu.Item>
             </Menu>
         </Sider>
