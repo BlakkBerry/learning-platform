@@ -17,6 +17,7 @@ const LoginPage = () => {
             cookies.set('Token', r.data.token, {path: '/'})
             cookies.set('User_ID', r.data.user.id, {path: '/'})
             history.push('')
+            window.location.reload()
         }).catch(err => console.log(err))
     }
 

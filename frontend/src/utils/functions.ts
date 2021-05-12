@@ -1,9 +1,12 @@
 import {Course} from "../types/course";
+import Cookies from 'universal-cookie';
 
 export const isAuthor = (course: Course) => {
+    const cookies = new Cookies()
+
     if (!course) {
         return false
     }
 
-    return course.author === 1 // TODO change to saved author id
+    return course.author === cookies.get('User_ID')
 }
