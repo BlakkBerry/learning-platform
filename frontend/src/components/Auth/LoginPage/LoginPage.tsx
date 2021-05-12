@@ -1,4 +1,4 @@
-import {Link, useHistory} from "react-router-dom";
+import {Link} from "react-router-dom";
 import {useForm} from "react-hook-form";
 import Cookies from 'universal-cookie';
 import React, {useState} from 'react';
@@ -8,7 +8,9 @@ const LoginPage = () => {
 
     const {register, handleSubmit, watch, formState: {errors}} = useForm()
     const [passwordShown, setPasswordShown] = useState(false)
-    let history = useHistory();
+    const [incorrect, SetIncorrect] = useState(false)
+    const [errorMsg, SetErrorMsg] = useState('')
+
 
     const onSubmit = (data: any) => {
         let payload = {email: data.Email, password: data.Password}
@@ -16,9 +18,15 @@ const LoginPage = () => {
         axios.post('http://127.0.0.1:8000/api/auth/login', payload).then(r => {
             cookies.set('Token', r.data.token, {path: '/'})
             cookies.set('User_ID', r.data.user.id, {path: '/'})
-            history.push('')
-            window.location.reload()
-        }).catch(err => console.log(err))
+            window.location.href = window.location.href.replace(window.location.pathname, '')
+        }).catch(err => {
+            SetIncorrect(true)
+            let timer = setTimeout(() => {
+                SetIncorrect(false)
+                clearTimeout(timer)
+            }, 5000);
+            SetErrorMsg(err.response.data?.non_field_errors)
+        })
     }
 
     const togglePasswordVisibility = () => {
@@ -37,7 +45,7 @@ const LoginPage = () => {
                             <span className="login100-form-title p-b-48">
                                 <i className="zmdi zmdi-font"/>
 					        </span>
-
+                            {incorrect && <div className="txt1 text-danger">{errorMsg}</div>}
                             <div className="wrap-input100 validate-input">
                                 {errors.Email &&
                                 <div className="txt2 validate-input-alert">You have entered an invalid email

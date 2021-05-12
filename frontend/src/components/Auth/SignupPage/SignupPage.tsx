@@ -1,4 +1,3 @@
-import {useHistory} from "react-router-dom";
 import {useForm} from "react-hook-form";
 import Cookies from 'universal-cookie';
 import React, {useState} from 'react';
@@ -8,7 +7,6 @@ import axios from "axios";
 const SignupPage = () => {
     const {register, handleSubmit, watch, formState: {errors}} = useForm()
     const [passwordShown, setPasswordShown] = useState(false)
-    let history = useHistory();
 
     const onSubmit = (data: any) => {
         let payload = {email: data.Email, username: data.Username, password: data.Password}
@@ -16,8 +14,7 @@ const SignupPage = () => {
         axios.post('http://127.0.0.1:8000/api/auth/register', payload).then(r => {
             cookies.set('Token', r.data.token, {path: '/'})
             cookies.set('User_ID', r.data.user.id, {path: '/'})
-            history.push('')
-            window.location.reload()
+            window.location.href = window.location.href.replace(window.location.pathname,'')
         }).catch(err => console.log(err))
     }
 
