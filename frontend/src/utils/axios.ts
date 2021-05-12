@@ -3,6 +3,6 @@ import axios from "axios";
 export const authAxios = axios.create({
     baseURL: 'http://127.0.0.1:8000/api',
     headers: {
-        Authorization: `Token b63db74c67a36b753d3a07aa8db693b28acc15bc39965b8a4a29b3bcca6aa0ca`
+        Authorization: `Token e0aeebeb7a5f33aa86c3bd0647ce2e213c6b40e1bfa18a84970953acb493bbb0`
     }
 })

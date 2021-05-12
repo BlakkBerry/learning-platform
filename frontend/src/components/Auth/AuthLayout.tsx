@@ -1,6 +1,8 @@
 import React, {FC, ReactChild, ReactNode} from 'react';
 import {Layout} from "antd";
-import {Content, Footer, Header} from "antd/es/layout/layout";
+import {Content} from "antd/es/layout/layout";
+import "./utils.css"
+import "./AuthLayout.css"
 
 interface IProps {
     children: ReactNode | ReactChild
@@ -9,11 +11,9 @@ interface IProps {
 const AuthLayout: FC<IProps> = ({children}) => {
     return (
         <Layout>
-            <Header>Header</Header>
             <Content>
                 {children}
             </Content>
-            <Footer>Footer</Footer>
         </Layout>
     );
 };
