@@ -8,5 +8,5 @@ export const isAuthor = (course: Course) => {
         return false
     }
 
-    return course.author === cookies.get('User_ID')
+    return course.author === parseInt(cookies.get('User_ID'))
 }

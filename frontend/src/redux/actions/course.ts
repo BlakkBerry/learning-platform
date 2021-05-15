@@ -42,7 +42,7 @@ export const fetchAuthorMaterials = () => {
     }
 }
 
-export const createCourse = (course: Course) => {
+export const createCourse = (course: Partial<Course>) => {
     return async (dispatch: Dispatch<CourseAction>) => {
         try {
             dispatch({type: CourseActionTypes.CREATE_SINGLE_COURSE, loadable: true})

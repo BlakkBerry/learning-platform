@@ -31,7 +31,7 @@ const MainLayout: FC<IProps> = ({children}) => {
                     {children}
                 </div>
             </Content>
-            <Footer style={{textAlign: 'center'}}>Ant Design ©2018 Created by Ant UED</Footer>
+            <Footer style={{textAlign: 'center'}}>©2021 Learning Platform</Footer>
         </Layout>
     </Layout>
 }
