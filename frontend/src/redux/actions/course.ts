@@ -5,7 +5,7 @@ import {authAxios} from "../../utils/axios";
 export const fetchStudentCourses = () => {
     return async (dispatch: Dispatch<CourseAction>) => {
         try {
-            dispatch({type: CourseActionTypes.FETCH_STUDENT_COURSES, loadable: true})
+            dispatch({type: CourseActionTypes.FETCH_STUDENT_COURSES})
 
             const materialsResponse = await authAxios.get<Array<Course>>('/get_student_bundle/')
             const materials = materialsResponse.data
@@ -15,8 +15,7 @@ export const fetchStudentCourses = () => {
         } catch (error) {
             dispatch({
                 type: CourseActionTypes.FETCH_STUDENT_COURSES_ERROR,
-                payload: {code: error.response.status, message: 'Failed to fetch student materials'},
-                throwable: true
+                payload: {code: error.response.status, message: 'Failed to fetch student materials'}
             })
         }
     }
@@ -25,7 +24,7 @@ export const fetchStudentCourses = () => {
 export const fetchAuthorMaterials = () => {
     return async (dispatch: Dispatch<CourseAction>) => {
         try {
-            dispatch({type: CourseActionTypes.FETCH_AUTHOR_COURSES, loadable: true})
+            dispatch({type: CourseActionTypes.FETCH_AUTHOR_COURSES})
 
             const materialsResponse = await authAxios.get<Array<Course>>('/get_author_bundle/')
             const materials = materialsResponse.data
@@ -35,8 +34,7 @@ export const fetchAuthorMaterials = () => {
         } catch (error) {
             dispatch({
                 type: CourseActionTypes.FETCH_AUTHOR_COURSES_ERROR,
-                payload: {code: error.response.status, message: 'Failed to fetch author materials'},
-                throwable: true
+                payload: {code: error.response.status, message: 'Failed to fetch author materials'}
             })
         }
     }
@@ -45,14 +43,13 @@ export const fetchAuthorMaterials = () => {
 export const createCourse = (course: Partial<Course>) => {
     return async (dispatch: Dispatch<CourseAction>) => {
         try {
-            dispatch({type: CourseActionTypes.CREATE_SINGLE_COURSE, loadable: true})
+            dispatch({type: CourseActionTypes.CREATE_SINGLE_COURSE})
             const response = await authAxios.post<Course>('/courses/', course)
             dispatch({type: CourseActionTypes.CREATE_SINGLE_COURSE_SUCCESS, payload: response.data})
         } catch (error) {
             dispatch({
                 type: CourseActionTypes.CREATE_SINGLE_COURSE_ERROR,
-                payload: {code: error.response.status, message: 'Failed to create course'},
-                throwable: true
+                payload: {code: error.response.status, message: 'Failed to create course'}
             })
         }
     }
@@ -61,11 +58,11 @@ export const createCourse = (course: Partial<Course>) => {
 export const updateCourse = (courseId: number, course: Partial<Course>) => {
     return async (dispatch: Dispatch<CourseAction>) => {
         try {
-            dispatch({type: CourseActionTypes.UPDATE_SINGLE_COURSE, loadable: true})
+            dispatch({type: CourseActionTypes.UPDATE_SINGLE_COURSE})
             const response = await authAxios.put<Course>(`/courses/${courseId}/`, course)
             dispatch({type: CourseActionTypes.UPDATE_SINGLE_COURSE_SUCCESS, payload: response.data})
         } catch (error) {
-            dispatch({type: CourseActionTypes.UPDATE_SINGLE_COURSE_ERROR, payload: {code: error.response.status, message: `Failed to update course with ID ${courseId}`}, throwable: true})
+            dispatch({type: CourseActionTypes.UPDATE_SINGLE_COURSE_ERROR, payload: {code: error.response.status, message: `Failed to update course with ID ${courseId}`}})
         }
     }
 }
@@ -73,14 +70,13 @@ export const updateCourse = (courseId: number, course: Partial<Course>) => {
 export const deleteCourse = (courseId: number) => {
     return async (dispatch: Dispatch<CourseAction>) => {
         try {
-            dispatch({type: CourseActionTypes.DELETE_SINGLE_COURSE, loadable: true})
+            dispatch({type: CourseActionTypes.DELETE_SINGLE_COURSE})
             await authAxios.delete(`/courses/${courseId}/`)
             dispatch({type: CourseActionTypes.DELETE_SINGLE_COURSE_SUCCESS, payload: courseId})
         } catch (error) {
             dispatch({
                 type: CourseActionTypes.DELETE_SINGLE_COURSE_ERROR,
-                payload: {code: error.response.status, message: `Failed to delete course with ID ${courseId}`},
-                throwable: true
+                payload: {code: error.response.status, message: `Failed to delete course with ID ${courseId}`}
             })
         }
     }

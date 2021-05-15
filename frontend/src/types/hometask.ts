@@ -1,4 +1,3 @@
-import {Loadable, Throwable} from "./common";
 import {RequestError} from "./error";
 
 export interface HomeTask {
@@ -10,50 +9,50 @@ export interface HomeTask {
     assignment: string
 }
 
-export interface FetchHomeTasksAction extends Loadable {
+export interface FetchHomeTasksAction {
     type: HomeTaskActionTypes.FETCH_HOMETASKS
 }
 export interface FetchHomeTasksSuccessAction {
     type: HomeTaskActionTypes.FETCH_HOMETASKS_SUCCESS,
     payload: Array<HomeTask>
 }
-export interface FetchHomeTasksErrorAction extends Throwable {
+export interface FetchHomeTasksErrorAction {
     type: HomeTaskActionTypes.FETCH_HOMETASKS_ERROR,
     payload: RequestError
 }
 
-export interface CreateHomeTaskAction extends Loadable {
+export interface CreateHomeTaskAction {
     type: HomeTaskActionTypes.CREATE_HOMETASK
 }
 export interface CreateHomeTaskSuccessAction {
     type: HomeTaskActionTypes.CREATE_HOMETASK_SUCCESS,
     payload: HomeTask
 }
-export interface CreateHomeTaskErrorAction extends Throwable {
+export interface CreateHomeTaskErrorAction {
     type: HomeTaskActionTypes.CREATE_HOMETASK_ERROR,
     payload: RequestError
 }
 
-export interface UpdateHomeTaskAction extends Loadable {
+export interface UpdateHomeTaskAction {
     type: HomeTaskActionTypes.UPDATE_HOMETASK
 }
 export interface UpdateHomeTaskSuccessAction {
     type: HomeTaskActionTypes.UPDATE_HOMETASK_SUCCESS,
     payload: HomeTask
 }
-export interface UpdateHomeTaskErrorAction extends Throwable {
+export interface UpdateHomeTaskErrorAction {
     type: HomeTaskActionTypes.UPDATE_HOMETASK_ERROR,
     payload: RequestError
 }
 
-export interface DeleteHomeTaskAction extends Loadable {
+export interface DeleteHomeTaskAction {
     type: HomeTaskActionTypes.DELETE_HOMETASK
 }
 export interface DeleteHomeTaskSuccessAction {
     type: HomeTaskActionTypes.DELETE_HOMETASK_SUCCESS,
     homeTaskId: number
 }
-export interface DeleteHomeTaskErrorAction extends Throwable {
+export interface DeleteHomeTaskErrorAction {
     type: HomeTaskActionTypes.DELETE_HOMETASK_ERROR,
     payload: RequestError
 }

@@ -1,5 +1,4 @@
 import {HomeTask} from "./hometask";
-import {Loadable, Throwable} from "./common";
 import {RequestError} from "./error";
 
 export interface Task {
@@ -11,50 +10,50 @@ export interface Task {
     homeTasks?: Array<HomeTask>
 }
 
-interface FetchTasksAction extends Loadable {
+interface FetchTasksAction {
     type: TaskActionTypes.FETCH_TASKS
 }
 interface FetchTasksSuccessAction {
     type: TaskActionTypes.FETCH_TASKS_SUCCESS,
     payload: Array<Task>
 }
-interface FetchTasksErrorAction extends Throwable {
+interface FetchTasksErrorAction {
     type: TaskActionTypes.FETCH_TASKS_ERROR,
     payload: RequestError
 }
 
-interface CreateTaskAction extends Loadable {
+interface CreateTaskAction {
     type: TaskActionTypes.CREATE_TASK
 }
 interface CreateTaskSuccessAction {
     type: TaskActionTypes.CREATE_TASK_SUCCESS,
     payload: Task
 }
-interface CreateTaskErrorAction extends Throwable {
+interface CreateTaskErrorAction {
     type: TaskActionTypes.CREATE_TASK_ERROR,
     payload: RequestError
 }
 
-interface UpdateTaskAction extends Loadable {
+interface UpdateTaskAction {
     type: TaskActionTypes.UPDATE_TASK
 }
 interface UpdateTaskSuccessAction {
     type: TaskActionTypes.UPDATE_TASK_SUCCESS,
     payload: Task
 }
-interface UpdateTaskErrorAction extends Throwable {
+interface UpdateTaskErrorAction {
     type: TaskActionTypes.UPDATE_TASK_ERROR,
     payload: RequestError
 }
 
-interface DeleteTaskAction extends Loadable {
+interface DeleteTaskAction {
     type: TaskActionTypes.DELETE_TASK
 }
 interface DeleteTaskSuccessAction {
     type: TaskActionTypes.DELETE_TASK_SUCCESS,
     taskId: number
 }
-interface DeleteTaskErrorAction extends Throwable {
+interface DeleteTaskErrorAction {
     type: TaskActionTypes.DELETE_TASK_ERROR,
     payload: RequestError
 }

@@ -1,6 +1,5 @@
 import {RequestError} from "./error";
 import {Lesson} from "./lesson";
-import {Loadable, Throwable} from "./common";
 
 export interface Module {
     id?: number
@@ -10,19 +9,19 @@ export interface Module {
     lessons?: Array<Lesson>
 }
 
-interface FetchModulesAction extends Loadable {
+interface FetchModulesAction {
     type: ModuleActionTypes.FETCH_MODULES
 }
 interface FetchModulesSuccessAction {
     type: ModuleActionTypes.FETCH_MODULES_SUCCESS,
     payload: Array<Module>
 }
-interface FetchModulesErrorAction extends Throwable {
+interface FetchModulesErrorAction {
     type: ModuleActionTypes.FETCH_MODULES_ERROR,
     payload: RequestError
 }
 
-interface CreateModuleAction extends Loadable {
+interface CreateModuleAction {
     type: ModuleActionTypes.CREATE_MODULE,
 }
 interface CreateModuleSuccessAction {
@@ -30,12 +29,12 @@ interface CreateModuleSuccessAction {
     payload: Module
     courseId: number
 }
-interface CreateModuleErrorAction extends Throwable {
+interface CreateModuleErrorAction {
     type: ModuleActionTypes.CREATE_MODULE_ERROR
     payload: RequestError,
 }
 
-interface UpdateModuleAction extends Loadable {
+interface UpdateModuleAction {
     type: ModuleActionTypes.UPDATE_MODULE,
 }
 interface UpdateModuleSuccessAction {
@@ -44,12 +43,12 @@ interface UpdateModuleSuccessAction {
     courseId: number
     moduleId: number
 }
-interface UpdateModuleErrorAction extends Throwable {
+interface UpdateModuleErrorAction {
     type: ModuleActionTypes.UPDATE_MODULE_ERROR
     payload: RequestError
 }
 
-interface DeleteModuleAction extends Loadable {
+interface DeleteModuleAction {
     type: ModuleActionTypes.DELETE_MODULE,
 }
 interface DeleteModuleSuccessAction {
@@ -57,7 +56,7 @@ interface DeleteModuleSuccessAction {
     courseId: number
     moduleId: number
 }
-interface DeleteModuleErrorAction extends Throwable {
+interface DeleteModuleErrorAction {
     type: ModuleActionTypes.DELETE_MODULE_ERROR
     payload: RequestError
 }

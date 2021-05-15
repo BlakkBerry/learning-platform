@@ -1,6 +1,5 @@
 import {RequestError} from "./error";
 import {User} from "./user";
-import {Loadable, Throwable} from "./common";
 
 export interface Request {
     id: number
@@ -8,26 +7,26 @@ export interface Request {
     code?: string
 }
 
-interface FetchCourseRequestsAction extends Loadable {
+interface FetchCourseRequestsAction {
     type: RequestActionTypes.FETCH_COURSE_REQUESTS
 }
 interface FetchCourseRequestsSuccessAction {
     type: RequestActionTypes.FETCH_COURSE_REQUESTS_SUCCESS,
     payload: Array<Request>,
 }
-interface FetchCourseRequestsErrorAction extends Throwable {
+interface FetchCourseRequestsErrorAction {
     type: RequestActionTypes.FETCH_COURSE_REQUESTS_ERROR,
     payload: RequestError
 }
 
-interface CreateCourseRequestAction extends Loadable {
+interface CreateCourseRequestAction {
     type: RequestActionTypes.CREATE_COURSE_REQUEST
 }
 interface CreateCourseRequestSuccessAction {
     type: RequestActionTypes.CREATE_COURSE_REQUEST_SUCCESS,
     payload: Request
 }
-interface CreateCourseRequestErrorAction extends Throwable {
+interface CreateCourseRequestErrorAction {
     type: RequestActionTypes.CREATE_COURSE_REQUEST_ERROR
     payload: RequestError
 }
@@ -41,8 +40,8 @@ export interface RequestState {
 export enum RequestActionTypes {
 
     FETCH_COURSE_REQUESTS = 'REQUESTS/FETCH_COURSE_REQUESTS',
-    FETCH_COURSE_REQUESTS_SUCCESS = 'REQUESTS/FETCH_COURSE_REQUESTS',
-    FETCH_COURSE_REQUESTS_ERROR = 'REQUESTS/FETCH_COURSE_REQUESTS',
+    FETCH_COURSE_REQUESTS_SUCCESS = 'REQUESTS/FETCH_COURSE_REQUESTS_SUCCESS',
+    FETCH_COURSE_REQUESTS_ERROR = 'REQUESTS/FETCH_COURSE_REQUESTS_ERROR',
 
     CREATE_COURSE_REQUEST = 'REQUESTS/CREATE_COURSE_REQUEST',
     CREATE_COURSE_REQUEST_SUCCESS = 'REQUESTS/CREATE_COURSE_REQUEST_SUCCESS',

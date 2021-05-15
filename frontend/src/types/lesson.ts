@@ -1,5 +1,4 @@
 import {Task} from "./task";
-import {Loadable, Throwable} from "./common";
 import {RequestError} from "./error";
 
 export interface Lesson {
@@ -10,31 +9,31 @@ export interface Lesson {
     tasks?: Array<Task>
 }
 
-interface FetchLessonsAction extends Loadable {
+interface FetchLessonsAction {
     type: LessonActionTypes.FETCH_LESSONS
 }
 interface FetchLessonsSuccessAction {
     type: LessonActionTypes.FETCH_LESSONS_SUCCESS,
     payload: Array<Lesson>
 }
-interface FetchLessonsErrorAction extends Throwable {
+interface FetchLessonsErrorAction {
     type: LessonActionTypes.FETCH_LESSONS_ERROR,
     payload: RequestError
 }
 
-interface CreateLessonAction extends Loadable {
+interface CreateLessonAction {
     type: LessonActionTypes.CREATE_LESSON
 }
 interface CreateLessonSuccessAction {
     type: LessonActionTypes.CREATE_LESSON_SUCCESS,
     payload: Lesson
 }
-interface CreateLessonErrorAction extends Throwable {
+interface CreateLessonErrorAction {
     type: LessonActionTypes.CREATE_LESSON_ERROR,
     payload: RequestError
 }
 
-interface UpdateLessonAction extends Loadable {
+interface UpdateLessonAction {
     type: LessonActionTypes.UPDATE_LESSON
 }
 interface UpdateLessonSuccessAction {
@@ -42,19 +41,19 @@ interface UpdateLessonSuccessAction {
     payload: Lesson,
     lessonId: number
 }
-interface UpdateLessonErrorAction extends Throwable {
+interface UpdateLessonErrorAction {
     type: LessonActionTypes.UPDATE_LESSON_ERROR,
     payload: RequestError
 }
 
-interface DeleteLessonAction extends Loadable {
+interface DeleteLessonAction {
     type: LessonActionTypes.DELETE_LESSON
 }
 interface DeleteLessonSuccessAction {
     type: LessonActionTypes.DELETE_LESSON_SUCCESS,
     lessonId: number
 }
-interface DeleteLessonErrorAction extends Throwable {
+interface DeleteLessonErrorAction {
     type: LessonActionTypes.DELETE_LESSON_ERROR,
     payload: RequestError
 }

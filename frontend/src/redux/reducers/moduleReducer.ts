@@ -13,15 +13,21 @@ export const moduleReducer = (state = initialState, action: ModuleAction): Modul
     const setModules = (modules: Module[]): ModuleState => ({...state, loading: false, error: null, modules})
     const setError = (error: RequestError): ModuleState => ({...state, loading: false, error: error})
 
-    if ("loadable" in action) {
-        return setLoading()
-    }
-
-    if ("throwable" in action) {
-        return setError(action.payload)
-    }
-
     switch (action.type) {
+
+        case ModuleActionTypes.FETCH_MODULES:
+        case ModuleActionTypes.CREATE_MODULE:
+        case ModuleActionTypes.UPDATE_MODULE:
+        case ModuleActionTypes.DELETE_MODULE:
+            return setLoading()
+
+        case ModuleActionTypes.FETCH_MODULES_ERROR:
+        case ModuleActionTypes.CREATE_MODULE_ERROR:
+        case ModuleActionTypes.UPDATE_MODULE_ERROR:
+        case ModuleActionTypes.DELETE_MODULE_ERROR:
+            return setError(action.payload)
+
+
         case ModuleActionTypes.FETCH_MODULES_SUCCESS:
             return setModules(action.payload)
 
@@ -31,11 +37,11 @@ export const moduleReducer = (state = initialState, action: ModuleAction): Modul
         case ModuleActionTypes.UPDATE_MODULE_SUCCESS:
             return setModules(
                 state.modules.map(module => {
-                if (module.id === action.moduleId) {
-                    return action.payload
-                }
-                return module
-            }))
+                    if (module.id === action.moduleId) {
+                        return action.payload
+                    }
+                    return module
+                }))
 
         case ModuleActionTypes.DELETE_MODULE_SUCCESS:
             return setModules(state.modules.filter(module => module.id !== action.moduleId))

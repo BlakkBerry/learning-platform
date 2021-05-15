@@ -4,7 +4,7 @@ import Course from "./Course/Course";
 import {useTypedSelector} from "../../../../hooks/useTypedSelector";
 import {useActions} from "../../../../hooks/useActions";
 import './Courses.css'
-import {Link} from "react-router-dom"
+import {Link, useHistory} from "react-router-dom"
 
 interface CoursesProps {
     isAuthor: boolean
@@ -14,6 +14,7 @@ const Courses: FC<CoursesProps> = ({isAuthor}) => {
 
     const {authorCourses, studentCourses, loading, error} = useTypedSelector(state => state.courses)
     const {fetchAuthorMaterials, fetchStudentCourses} = useActions()
+    const history = useHistory()
 
     useEffect(() => {
         if (isAuthor) {
@@ -23,9 +24,14 @@ const Courses: FC<CoursesProps> = ({isAuthor}) => {
         }
     }, [])
 
-
     if (error) {
-        return <h1 color="red">{error}</h1>
+
+        if (error.code === 401) {
+            history.push('/login')
+            return null
+        }
+
+        return <h1 color="red">{error.message}</h1>
     }
 
     if (loading) {

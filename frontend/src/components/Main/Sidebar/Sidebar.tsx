@@ -1,16 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {Layout, Menu} from "antd";
+import {Layout, Menu, Spin} from "antd";
 import {
     DesktopOutlined, FileOutlined,
     ProfileOutlined,
     RiseOutlined,
     ScheduleOutlined,
-    SnippetsOutlined,
-    UserOutlined
+    SnippetsOutlined
 } from "@ant-design/icons";
 import {useTypedSelector} from "../../../hooks/useTypedSelector";
 import {useActions} from "../../../hooks/useActions";
-import {Link} from "react-router-dom"
+import {Link, useHistory} from "react-router-dom"
 
 const {Sider} = Layout;
 const {SubMenu} = Menu;
@@ -19,10 +18,27 @@ const Sidebar = () => {
     const [collapsed, setCollapsed] = useState(false);
     const {authorCourses, studentCourses, loading, error} = useTypedSelector(state => state.courses)
     const {fetchAuthorMaterials} = useActions()
+    const history = useHistory()
 
     useEffect(() => {
         fetchAuthorMaterials()
     }, [])
+
+
+    if (loading) {
+        return <div className="spinner">
+            <Spin/>
+        </div>
+    }
+
+    if (error) {
+        if (error.code === 401) {
+            history.push('/login')
+            return null
+        }
+
+        return <h1 color="red">{error.message}</h1>
+    }
 
     return (
         <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>

@@ -12,15 +12,19 @@ export const homeTaskReducer = (state = initialState, action: HomeTaskAction): H
     const setTasks = (homeTasks: Array<HomeTask>): HomeTaskState => ({...state, loading: false, error: null, homeTasks})
     const setError = (error: RequestError): HomeTaskState => ({...state, loading: false, error: error})
 
-    if ("loadable" in action) {
-        return setLoading()
-    }
-
-    if ("throwable" in action) {
-        return setError(action.payload)
-    }
-
     switch (action.type) {
+
+        case HomeTaskActionTypes.FETCH_HOMETASKS:
+        case HomeTaskActionTypes.CREATE_HOMETASK:
+        case HomeTaskActionTypes.UPDATE_HOMETASK:
+        case HomeTaskActionTypes.DELETE_HOMETASK:
+            return setLoading()
+
+        case HomeTaskActionTypes.FETCH_HOMETASKS_ERROR:
+        case HomeTaskActionTypes.CREATE_HOMETASK_ERROR:
+        case HomeTaskActionTypes.UPDATE_HOMETASK_ERROR:
+        case HomeTaskActionTypes.DELETE_HOMETASK_ERROR:
+            return setError(action.payload)
 
         case HomeTaskActionTypes.FETCH_HOMETASKS_SUCCESS:
             return setTasks(action.payload)

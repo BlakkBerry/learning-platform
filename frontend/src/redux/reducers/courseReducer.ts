@@ -24,15 +24,22 @@ export const courseReducer = (state = initialState, action: CourseAction): Cours
     })
     const setError = (error: RequestError): CourseState => ({...state, loading: false, error: error})
 
-    if ("loadable" in action) {
-        return setLoading()
-    }
-
-    if ("throwable" in action) {
-        return setError(action.payload)
-    }
-
     switch (action.type) {
+
+        case CourseActionTypes.FETCH_AUTHOR_COURSES:
+        case CourseActionTypes.FETCH_STUDENT_COURSES:
+        case CourseActionTypes.CREATE_SINGLE_COURSE:
+        case CourseActionTypes.UPDATE_SINGLE_COURSE:
+        case CourseActionTypes.DELETE_SINGLE_COURSE:
+            return setLoading()
+
+        case CourseActionTypes.FETCH_AUTHOR_COURSES_ERROR:
+        case CourseActionTypes.FETCH_STUDENT_COURSES_ERROR:
+        case CourseActionTypes.CREATE_SINGLE_COURSE_ERROR:
+        case CourseActionTypes.UPDATE_SINGLE_COURSE_ERROR:
+        case CourseActionTypes.DELETE_SINGLE_COURSE_ERROR:
+            return setError(action.payload)
+
         case CourseActionTypes.FETCH_STUDENT_COURSES_SUCCESS:
             return setStudentCourses(action.payload)
 

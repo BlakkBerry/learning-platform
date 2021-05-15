@@ -12,15 +12,20 @@ export const taskReducer = (state = initialState, action: TaskAction): TaskState
     const setTasks = (tasks: Array<Task>): TaskState => ({...state, loading: false, error: null, tasks})
     const setError = (error: RequestError): TaskState => ({...state, loading: false, error: error})
 
-    if ("loadable" in action) {
-        return setLoading()
-    }
-
-    if ("throwable" in action) {
-        return setError(action.payload)
-    }
-
     switch (action.type) {
+
+        case TaskActionTypes.FETCH_TASKS:
+        case TaskActionTypes.CREATE_TASK:
+        case TaskActionTypes.UPDATE_TASK:
+        case TaskActionTypes.DELETE_TASK:
+            return setLoading()
+
+        case TaskActionTypes.FETCH_TASKS_ERROR:
+        case TaskActionTypes.CREATE_TASK_ERROR:
+        case TaskActionTypes.UPDATE_TASK_ERROR:
+        case TaskActionTypes.DELETE_TASK_ERROR:
+            return setError(action.payload)
+
         case TaskActionTypes.FETCH_TASKS_SUCCESS:
             return setTasks(action.payload)
 

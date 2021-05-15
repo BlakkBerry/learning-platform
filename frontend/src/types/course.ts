@@ -1,7 +1,6 @@
 import {RequestError} from "./error";
 import {User} from "./user";
 import {Module} from "./module";
-import {Loadable, Throwable} from "./common";
 
 export interface Course {
     id?: number
@@ -17,62 +16,62 @@ export interface Course {
     modules?: Array<Module>
 }
 
-interface FetchStudentCoursesAction extends Loadable {
+interface FetchStudentCoursesAction {
     type: CourseActionTypes.FETCH_STUDENT_COURSES
 }
 interface FetchStudentCoursesSuccessAction {
     type: CourseActionTypes.FETCH_STUDENT_COURSES_SUCCESS
     payload: Array<Course>
 }
-interface FetchStudentCoursesErrorAction extends Throwable {
+interface FetchStudentCoursesErrorAction {
     type: CourseActionTypes.FETCH_STUDENT_COURSES_ERROR,
     payload: RequestError
 }
 
-interface FetchAuthorCoursesAction extends Loadable {
+interface FetchAuthorCoursesAction {
     type: CourseActionTypes.FETCH_AUTHOR_COURSES,
 }
 interface FetchAuthorCoursesSuccessAction {
     type: CourseActionTypes.FETCH_AUTHOR_COURSES_SUCCESS
     payload: Array<Course>
 }
-interface FetchAuthorCoursesErrorAction extends Throwable {
+interface FetchAuthorCoursesErrorAction {
     type: CourseActionTypes.FETCH_AUTHOR_COURSES_ERROR
     payload: RequestError,
 }
 
-interface CreateCourseAction extends Loadable {
+interface CreateCourseAction {
     type: CourseActionTypes.CREATE_SINGLE_COURSE,
 }
 interface CreateCourseSuccessAction {
     type: CourseActionTypes.CREATE_SINGLE_COURSE_SUCCESS,
     payload: Course
 }
-interface CreateCourseErrorAction extends Throwable {
+interface CreateCourseErrorAction {
     type: CourseActionTypes.CREATE_SINGLE_COURSE_ERROR
     payload: RequestError,
 }
 
-interface UpdateCourseAction extends Loadable {
+interface UpdateCourseAction {
     type: CourseActionTypes.UPDATE_SINGLE_COURSE,
 }
 interface UpdateCourseSuccessAction {
     type: CourseActionTypes.UPDATE_SINGLE_COURSE_SUCCESS
     payload: Course
 }
-interface UpdateCourseErrorAction extends Throwable {
+interface UpdateCourseErrorAction {
     type: CourseActionTypes.UPDATE_SINGLE_COURSE_ERROR
     payload: RequestError,
 }
 
-interface DeleteCourseAction extends Loadable {
+interface DeleteCourseAction {
     type: CourseActionTypes.DELETE_SINGLE_COURSE,
 }
 interface DeleteCourseSuccessAction {
     type: CourseActionTypes.DELETE_SINGLE_COURSE_SUCCESS,
     payload: number
 }
-interface DeleteCourseErrorAction extends Throwable {
+interface DeleteCourseErrorAction {
     type: CourseActionTypes.DELETE_SINGLE_COURSE_ERROR
     payload: RequestError,
 }

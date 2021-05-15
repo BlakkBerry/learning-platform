@@ -12,15 +12,19 @@ export const lessonReducer = (state = initialState, action: LessonAction): Lesso
     const setLessons = (lessons: Array<Lesson>): LessonState => ({...state, loading: false, error: null, lessons})
     const setError = (error: RequestError): LessonState => ({...state, loading: false, error: error})
 
-    if ("loadable" in action) {
-        return setLoading()
-    }
-
-    if ("throwable" in action) {
-        return setError(action.payload)
-    }
-
     switch (action.type) {
+
+        case LessonActionTypes.FETCH_LESSONS:
+        case LessonActionTypes.CREATE_LESSON:
+        case LessonActionTypes.UPDATE_LESSON:
+        case LessonActionTypes.DELETE_LESSON:
+            return setLoading()
+
+        case LessonActionTypes.FETCH_LESSONS_ERROR:
+        case LessonActionTypes.CREATE_LESSON_ERROR:
+        case LessonActionTypes.UPDATE_LESSON_ERROR:
+        case LessonActionTypes.DELETE_LESSON_ERROR:
+            return setError(action.payload)
 
         case LessonActionTypes.FETCH_LESSONS_SUCCESS:
             return setLessons(action.payload)

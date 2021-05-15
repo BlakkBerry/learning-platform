@@ -12,15 +12,16 @@ export const requestReducer = (state: RequestState = initialState, action: Reque
     const setSuccess = (requests: Array<Request>): RequestState => ({...state, loading: false, error: null, requests})
     const setError = (error: RequestError): RequestState => ({...state, loading: false, error: error})
 
-    if ("loadable" in action) {
-        return setLoading()
-    }
-
-    if ("throwable" in action) {
-        return setError(action.payload)
-    }
-
     switch (action.type) {
+
+        case RequestActionTypes.FETCH_COURSE_REQUESTS:
+        case RequestActionTypes.CREATE_COURSE_REQUEST:
+            return setLoading()
+
+        case RequestActionTypes.FETCH_COURSE_REQUESTS_ERROR:
+        case RequestActionTypes.CREATE_COURSE_REQUEST_ERROR:
+            return setError(action.payload)
+
         case RequestActionTypes.FETCH_COURSE_REQUESTS_SUCCESS:
             return setSuccess(action.payload)
 

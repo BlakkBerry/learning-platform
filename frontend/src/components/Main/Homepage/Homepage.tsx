@@ -1,6 +1,6 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Courses from "./Courses/Courses";
-import {Button, Drawer, Form, Input, Modal} from "antd";
+import {Button, Drawer, Form, Input, Modal, Spin} from "antd";
 import {PlusOutlined, RetweetOutlined} from "@ant-design/icons";
 import {useActions} from "../../../hooks/useActions";
 import {useTypedSelector} from "../../../hooks/useTypedSelector";
@@ -13,10 +13,10 @@ const Homepage = () => {
     const code = useRef<any>(null)
 
     const {requests, error, loading} = useTypedSelector(state => state.requests)
-    const {createCourseRequest} = useActions()
-    const {createCourse} = useActions()
+    const {createCourseRequest, createCourse} = useActions()
 
     const [visible, setVisible] = useState(false);
+
 
     const onSubmit = (values: any) => {
         const data: Partial<Course> = {...values}
@@ -116,6 +116,16 @@ const Homepage = () => {
                 }
             }
         })
+    }
+
+    if (loading) {
+        return <div className="spinner">
+            <Spin/>
+        </div>
+    }
+
+    if (error) {
+        return <h1 color="red">{error}</h1>
     }
 
     return (
