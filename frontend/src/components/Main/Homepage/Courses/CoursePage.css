@@ -1,6 +1,7 @@
-.menu-item{
+.menu-item {
     padding: 5px !important;
 }
-input{
+
+input, textarea {
     cursor: auto !important;
 }

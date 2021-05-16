@@ -73,6 +73,7 @@ export const deleteCourse = (courseId: number) => {
             dispatch({type: CourseActionTypes.DELETE_SINGLE_COURSE})
             await authAxios.delete(`/courses/${courseId}/`)
             dispatch({type: CourseActionTypes.DELETE_SINGLE_COURSE_SUCCESS, payload: courseId})
+            window.history.back()
         } catch (error) {
             dispatch({
                 type: CourseActionTypes.DELETE_SINGLE_COURSE_ERROR,

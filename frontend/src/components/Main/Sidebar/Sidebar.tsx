@@ -15,7 +15,7 @@ const {Sider} = Layout;
 const {SubMenu} = Menu;
 
 const Sidebar = () => {
-    const [collapsed, setCollapsed] = useState(false);
+    const [collapsed, setCollapsed] = useState(true);
     const {authorCourses, studentCourses, loading, error} = useTypedSelector(state => state.courses)
     const {fetchAuthorMaterials} = useActions()
     const history = useHistory()
@@ -55,11 +55,6 @@ const Sidebar = () => {
                     </Link>
                 </Menu.Item>
 
-                {/*<SubMenu key="sub1" icon={<UserOutlined/>} title="User">*/}
-                {/*    <Menu.Item key="3">Tom</Menu.Item>*/}
-                {/*    <Menu.Item key="4">Bill</Menu.Item>*/}
-                {/*    <Menu.Item key="5">Alex</Menu.Item>*/}
-                {/*</SubMenu>*/}
                 <SubMenu key="courses" icon={<ScheduleOutlined/>} title="My Courses">
                     {authorCourses.map(course =>
                         <SubMenu key={course.id} icon={<ProfileOutlined/>} title={course.name}>

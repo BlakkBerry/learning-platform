@@ -17,7 +17,7 @@ export const fetchModules = (courseId: number) => {
     }
 }
 
-export const createModule = (courseId: number, module: Module) => {
+export const createModule = (courseId: number, module: Partial<Module>) => {
     return async (dispatch: Dispatch<ModuleAction>) => {
         try {
             dispatch({type: ModuleActionTypes.CREATE_MODULE})
@@ -53,9 +53,10 @@ export const deleteModule = (courseId: number, moduleId: number) => {
             dispatch({type: ModuleActionTypes.DELETE_MODULE})
             await authAxios.delete(`/courses/${courseId}/modules/${moduleId}/`)
             dispatch({type: ModuleActionTypes.DELETE_MODULE_SUCCESS, courseId, moduleId})
+            window.history.back()
         } catch (error) {
             dispatch({
-                type: ModuleActionTypes.UPDATE_MODULE_ERROR,
+                type: ModuleActionTypes.DELETE_MODULE_ERROR,
                 payload: {code: error.response.status, message: 'Failed to delete the module'}
             })
         }

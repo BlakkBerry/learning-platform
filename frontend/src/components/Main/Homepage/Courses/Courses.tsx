@@ -1,7 +1,9 @@
 import React, {FC, useEffect} from 'react';
-import {List, Spin} from "antd";
+import {List, notification, Spin} from "antd";
 import Course from "./Course/Course";
 import {useTypedSelector} from "../../../../hooks/useTypedSelector";
+import {ExclamationCircleOutlined} from "@ant-design/icons";
+
 import {useActions} from "../../../../hooks/useActions";
 import './Courses.css'
 import {Link, useHistory} from "react-router-dom"
@@ -31,7 +33,11 @@ const Courses: FC<CoursesProps> = ({isAuthor}) => {
             return null
         }
 
-        return <h1 color="red">{error.message}</h1>
+        notification.open({
+            message: 'Error',
+            icon: <ExclamationCircleOutlined style={{color: "#f5222d"}}/>,
+            description: error.message,
+        })
     }
 
     if (loading) {
@@ -41,7 +47,7 @@ const Courses: FC<CoursesProps> = ({isAuthor}) => {
     }
 
     return <>
-        <h1 style={{textAlign: 'center', fontSize: '2rem'}}>{isAuthor ? 'Created Courses' : 'My Courses'}</h1>
+        <h1 style={{textAlign: 'center', fontSize: '2rem', paddingTop:"40px"}}>{isAuthor ? 'Created Courses' : 'My Courses'}</h1>
         <List
             grid={{
                 gutter: 16,

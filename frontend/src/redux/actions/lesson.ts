@@ -17,7 +17,7 @@ export const fetchLessons = (courseId: number, moduleId: number) => {
     }
 }
 
-export const createLesson = (courseId: number, moduleId: number, lesson: Lesson) => {
+export const createLesson = (courseId: number, moduleId: number, lesson: Partial<Lesson>) => {
     return async (dispatch: Dispatch<LessonAction>) => {
         try {
             dispatch({type: LessonActionTypes.CREATE_LESSON})
@@ -53,6 +53,7 @@ export const deleteLesson = (courseId: number, moduleId: number, lessonId: numbe
             dispatch({type: LessonActionTypes.DELETE_LESSON})
             await authAxios.delete<Lesson>(`/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/`)
             dispatch({type: LessonActionTypes.DELETE_LESSON_SUCCESS, courseId, moduleId, lessonId})
+            window.history.back()
         } catch (error) {
             dispatch({
                 type: LessonActionTypes.DELETE_LESSON_ERROR,

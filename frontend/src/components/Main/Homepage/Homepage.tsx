@@ -1,10 +1,11 @@
 import React, {useEffect, useRef, useState} from 'react';
 import Courses from "./Courses/Courses";
-import {Button, Drawer, Form, Input, Modal, Spin} from "antd";
-import {PlusOutlined, RetweetOutlined} from "@ant-design/icons";
+import {Button, Drawer, Form, Input, notification, Modal, Spin} from "antd";
+import {PlusOutlined, RetweetOutlined, ExclamationCircleOutlined} from "@ant-design/icons";
 import {useActions} from "../../../hooks/useActions";
 import {useTypedSelector} from "../../../hooks/useTypedSelector";
 import {Course} from "../../../types/course";
+import {RequestError} from "../../../types/error";
 
 const {TextArea} = Input;
 
@@ -17,15 +18,16 @@ const Homepage = () => {
 
     const [visible, setVisible] = useState(false);
 
+    const prevErrorRef = useRef<RequestError | null>();
+    useEffect(() => {
+        prevErrorRef.current = error
+    })
+    const prevError = prevErrorRef.current
 
     const onSubmit = (values: any) => {
         const data: Partial<Course> = {...values}
-        try {
-            createCourse(data)
-            onClose()
-        } catch (e) {
-            console.log(error?.message)
-        }
+        createCourse(data)
+        onClose()
     }
 
     function codeInput() {
@@ -95,12 +97,21 @@ const Homepage = () => {
 
     const showDrawer = () => {
         setVisible(true)
-    };
+    }
 
     const onClose = () => {
         setVisible(false)
     }
 
+    const showError = () => {
+        if (error) {
+            notification.open({
+                message: 'Error',
+                icon: <ExclamationCircleOutlined style={{color: "#f5222d"}}/>,
+                description: error.message,
+            })
+        }
+    }
 
     const connect = () => {
         Modal.confirm({
@@ -109,11 +120,7 @@ const Homepage = () => {
             content: codeInput(),
 
             onOk() {
-                try {
-                    createCourseRequest(code.current?.state.value)
-                } catch (e) {
-                    console.log(error?.message)
-                }
+                createCourseRequest(code.current?.state.value)
             }
         })
     }
@@ -124,32 +131,38 @@ const Homepage = () => {
         </div>
     }
 
-    if (error) {
-        return <h1 color="red">{error}</h1>
+
+    if (prevError?.message !== error?.message) {
+        showError()
     }
 
     return (
-        <div>
-            <Button className="px-5 mr-3" type="primary" shape="round"
-                    onClick={showDrawer}
-                    icon={<PlusOutlined style={{verticalAlign: "baseline"}}/>}
-                    size='large'>Create</Button>
-            <Button onClick={connect} className="px-5 mx-3" type="primary" shape="round"
-                    icon={<RetweetOutlined style={{verticalAlign: "baseline"}}/>}
-                    size='large'>Connect</Button>
-            <Drawer
-                title="Enter course details"
-                placement="right"
-                closable={false}
-                onClose={onClose}
-                visible={visible}
-                width={"35vw"}
-            >
-                {courseInput()}
-            </Drawer>
-            <Courses isAuthor={false}/>
-            <Courses isAuthor={true}/>
-        </div>
+        <>
+            <div>
+                <div style={{position: "absolute", right: 0}} className="px-5 mr-3 float-right">
+                    <Button className="px-5 mr-3" type="primary" shape="round"
+                            onClick={showDrawer}
+                            icon={<PlusOutlined style={{verticalAlign: "baseline"}}/>}
+                            size='large'>Create</Button>
+                    <Button onClick={connect} className="px-5 mx-3" type="primary" shape="round"
+                            icon={<RetweetOutlined style={{verticalAlign: "baseline"}}/>}
+                            size='large'>Connect</Button>
+                </div>
+
+                <Drawer
+                    title="Enter course details"
+                    placement="right"
+                    closable={false}
+                    onClose={onClose}
+                    visible={visible}
+                    width={"35vw"}
+                >
+                    {courseInput()}
+                </Drawer>
+                <Courses isAuthor={false}/>
+                <Courses isAuthor={true}/>
+            </div>
+        </>
     );
 };
 
