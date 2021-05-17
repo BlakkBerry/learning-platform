@@ -1,12 +1,12 @@
 import React, {FC, useEffect, useRef, useState} from 'react';
-import {useTypedSelector} from "../../../../../../hooks/useTypedSelector";
-import {useActions} from "../../../../../../hooks/useActions";
+import {useTypedSelector} from "../../../../../hooks/useTypedSelector";
+import {useActions} from "../../../../../hooks/useActions";
 import {Button, Drawer, Form, Input, List, notification, Spin} from "antd";
 import {Link} from "react-router-dom";
-import LessonItem from "./LessonItem/LessonItem";
+import LessonItem from "./LessonItem";
 import {PlusOutlined, ExclamationCircleOutlined} from "@ant-design/icons";
-import {RequestError} from "../../../../../../types/error";
-import {Lesson} from "../../../../../../types/lesson";
+import {RequestError} from "../../../../../types/error";
+import {Lesson} from "../../../../../types/lesson";
 
 
 const {TextArea} = Input;
@@ -72,7 +72,7 @@ const Lessons: FC<LessonsProps> = ({courseId, moduleId, author}) => {
                     rules={[
                         {
                             required: true,
-                            message: 'Please input course name!',
+                            message: 'Please input lesson name!',
                         },
                     ]}
                 >
@@ -112,7 +112,7 @@ const Lessons: FC<LessonsProps> = ({courseId, moduleId, author}) => {
                            icon={<PlusOutlined style={{verticalAlign: "baseline"}}/>}
                            size='large'>Create</Button>}
         <Drawer
-            title="Enter course details"
+            title="Enter lesson details"
             placement="right"
             closable={false}
             onClose={onClose}

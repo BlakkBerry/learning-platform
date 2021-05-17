@@ -1,6 +1,6 @@
 import React, {FC, useEffect} from 'react';
 import {List, notification, Spin} from "antd";
-import Course from "./Course/Course";
+import CourseItem from "./CourseItem";
 import {useTypedSelector} from "../../../../hooks/useTypedSelector";
 import {ExclamationCircleOutlined} from "@ant-design/icons";
 
@@ -62,7 +62,7 @@ const Courses: FC<CoursesProps> = ({isAuthor}) => {
             renderItem={course => (
                 <List.Item>
                     <Link to={`/courses/${course.id}`}>
-                        <Course {...course}/>
+                        <CourseItem {...course}/>
                     </Link>
                 </List.Item>
             )}

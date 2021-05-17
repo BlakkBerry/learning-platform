@@ -1,37 +1,36 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {useParams} from "react-router-dom";
-import {Course} from "../../../../../../types/course";
-import {Lesson} from "../../../../../../types/lesson";
-import {authAxios} from "../../../../../../utils/axios";
-import {Button, Form, Input, Menu, Modal, notification, Spin} from "antd";
-import {isAuthor} from "../../../../../../utils/functions";
-import {useActions} from "../../../../../../hooks/useActions";
-import {useTypedSelector} from "../../../../../../hooks/useTypedSelector";
+import {useHistory, useParams} from "react-router-dom";
+import {Course} from "../../../../../types/course";
+import {Task} from "../../../../../types/task";
+import {authAxios} from "../../../../../utils/axios";
+import {useActions} from "../../../../../hooks/useActions";
+import {RequestError} from "../../../../../types/error";
+import {useTypedSelector} from "../../../../../hooks/useTypedSelector";
+import {Button, DatePicker, Form, Input, Menu, Modal, notification, Spin} from "antd";
 import {ExclamationCircleOutlined} from "@ant-design/icons";
-import {deleteLesson} from "../../../../../../redux/actions/lesson";
-import {useHistory} from "react-router-dom";
-import {RequestError} from "../../../../../../types/error";
+import {isAuthor} from "../../../../../utils/functions";
+import moment from 'moment';
 
 const {SubMenu} = Menu;
 const {TextArea} = Input;
 
-const LessonPage = () => {
-    const {courseId, moduleId, id}: any = useParams()
+const TaskPage = () => {
+    const {courseId, moduleId, lessonId, id}: any = useParams()
     const [course, setCourse] = useState<Course>()
-    const [lesson, setLesson] = useState<Lesson>()
+    const [task, setTask] = useState<Task>()
 
     useEffect(() => {
         authAxios.get<Course>(`/courses/${courseId}/`).then(res => {
             setCourse(res.data)
         })
 
-        authAxios.get<Lesson>(`/courses/${courseId}/modules/${moduleId}/lessons/${id}/`).then(res => {
-            setLesson(res.data)
+        authAxios.get<Task>(`/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/tasks/${id}/`).then(res => {
+            setTask(res.data)
         })
     }, [])
 
-    const {requests, error, loading} = useTypedSelector(state => state.requests)
-    const {updateLesson, deleteLesson} = useActions()
+    const {tasks, error, loading} = useTypedSelector(state => state.tasks)
+    const {updateTask, deleteTask} = useActions()
     const history = useHistory()
 
     const prevErrorRef = useRef<RequestError | null>();
@@ -50,27 +49,29 @@ const LessonPage = () => {
         }
     }
 
-    const update = (values: any) => {
-        updateLesson(courseId, moduleId, id, {...values})
+    const update = (values: Partial<Task> | any) => {
+        const date = values.due_date?.format('YYYY-MM-DD')
+
+        updateTask(courseId, moduleId, lessonId, id,
+            {...values, due_date: date})
+
     }
 
     const del = () => {
         Modal.confirm({
-            title: 'Delete module?',
+            title: 'Delete task?',
             icon: <ExclamationCircleOutlined/>,
             content: 'Data could not be recovered',
             okText: 'Yes',
             okType: 'danger',
             cancelText: 'No',
             onOk() {
-                deleteLesson(courseId, moduleId, id)
-                // history.goBack()
+                deleteTask(courseId, moduleId, lessonId, id)
             }
         })
     }
 
-
-    if (!lesson) {
+    if (!task) {
         return <div className="spinner">
             <Spin/>
         </div>
@@ -81,10 +82,9 @@ const LessonPage = () => {
     }
 
     const author: boolean = isAuthor(course!)
-
     return (
         <>
-            <h1 style={{textAlign: 'center', fontSize: '2rem'}}>Lesson details</h1>
+            <h1 style={{textAlign: 'center', fontSize: '2rem'}}>Task details</h1>
             <Form
                 name="basic"
                 initialValues={{
@@ -100,7 +100,7 @@ const LessonPage = () => {
                             message: 'Please input lesson name!',
                         },
                     ]}
-                    initialValue={lesson.name}
+                    initialValue={task.name}
                 >
                     <Input placeholder="Name" addonBefore="Name" disabled={!author}
                            className="detail-input"/>
@@ -108,10 +108,24 @@ const LessonPage = () => {
 
                 <Form.Item
                     name="description"
-                    initialValue={lesson.description}
+                    initialValue={task.description}
                 >
                     <TextArea disabled={!author} autoSize={{minRows: 6}} showCount maxLength={300}
                               placeholder="Description" className="detail-input"/>
+                </Form.Item>
+
+                <Form.Item label="Max score"
+                           name="max_score"
+                           initialValue={task.max_score}
+                >
+                    <Input type="number" placeholder="100"/>
+                </Form.Item>
+
+                <Form.Item label="Due to"
+                           name="due_date"
+                           initialValue={moment(task.due_date, 'YYYY-MM-DD')}
+                >
+                    <DatePicker format='YYYY-MM-DD'/>
                 </Form.Item>
 
                 {author && <Menu mode="inline" style={{width: 256}}>
@@ -129,9 +143,9 @@ const LessonPage = () => {
                     </SubMenu>
                 </Menu>}
             </Form>
-            {/*<Tasks courseId={courseId} moduleId={moduleId} lessonId={lesson.id}>*/}
+            {/*HomeTasks*/}
         </>
     );
 };
 
-export default LessonPage;
+export default TaskPage;

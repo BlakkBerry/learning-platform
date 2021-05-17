@@ -2,9 +2,9 @@ import React from 'react';
 import {DesktopOutlined, FileOutlined, RiseOutlined} from "@ant-design/icons";
 import {Meta} from "antd/es/list/Item";
 import {Card} from "antd";
-import './Course.css'
+import './CourseItem.css'
 
-const Course = (course: any) => {
+const CourseItem = (course: any) => {
 
     return (
         <Card
@@ -31,4 +31,4 @@ const Course = (course: any) => {
     );
 };
 
-export default Course;
+export default CourseItem;

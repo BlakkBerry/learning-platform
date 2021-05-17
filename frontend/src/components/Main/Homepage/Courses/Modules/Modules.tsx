@@ -3,7 +3,7 @@ import {useTypedSelector} from "../../../../../hooks/useTypedSelector";
 import {useActions} from "../../../../../hooks/useActions";
 import {Button, Drawer, Form, Input, List, notification, Spin} from "antd";
 import {Link} from "react-router-dom";
-import ModuleItem from "./ModuleItem/ModuleItem";
+import ModuleItem from "./ModuleItem";
 import {PlusOutlined, ExclamationCircleOutlined} from "@ant-design/icons";
 import {Module} from "../../../../../types/module";
 import {RequestError} from "../../../../../types/error";
@@ -71,7 +71,7 @@ const Modules: FC<ModulesProps> = ({courseId, author}) => {
                     rules={[
                         {
                             required: true,
-                            message: 'Please input course name!',
+                            message: 'Please input module name!',
                         },
                     ]}
                 >
@@ -112,7 +112,7 @@ const Modules: FC<ModulesProps> = ({courseId, author}) => {
                             size='large'>Create</Button>}
 
         <Drawer
-            title="Enter course details"
+            title="Enter module details"
             placement="right"
             closable={false}
             onClose={onClose}

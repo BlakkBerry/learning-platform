@@ -1,10 +1,10 @@
 import React from 'react';
-import {Lesson} from "../../../../../../../types/lesson";
+import {Module} from "../../../../../types/module";
 import {Card} from "antd";
 import {DesktopOutlined, FileOutlined, RiseOutlined} from "@ant-design/icons";
 import {Meta} from "antd/es/list/Item";
 
-const LessonItem = (lesson: Lesson) => {
+const ModuleItem = (module: Module) => {
     return (
         <Card
             hoverable
@@ -12,7 +12,7 @@ const LessonItem = (lesson: Lesson) => {
                 <img
                     className="card__image"
                     height={200}
-                    alt={lesson.name}
+                    alt={module.name}
                     src={'https://i.stack.imgur.com/y9DpT.jpg'}
                 />
             }
@@ -23,11 +23,11 @@ const LessonItem = (lesson: Lesson) => {
             ]}
         >
             <Meta
-                title={lesson.name}
-                description={lesson.description}
+                title={module.name}
+                description={module.description}
             />
         </Card>
     );
 };
 
-export default LessonItem;
+export default ModuleItem;

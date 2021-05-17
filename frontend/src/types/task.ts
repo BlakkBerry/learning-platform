@@ -6,7 +6,7 @@ export interface Task {
     name: string
     description?: string
     max_score: number
-    dueDate?: Date
+    due_date?: Date
     homeTasks?: Array<HomeTask>
 }
 
