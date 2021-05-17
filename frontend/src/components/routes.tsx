@@ -9,7 +9,8 @@ import Progress from "./Main/Homepage/Progess/Progress";
 import Files from "./Main/Homepage/CourseFiles/Files";
 import CoursePage from "./Main/Homepage/Courses/CoursePage";
 import ModulePage from "./Main/Homepage/Courses/Modules/ModulePage";
-import LessonPage from "./Main/Homepage/Courses/Modules/Lessons/LessonPage";
+import LessonPage from "./Main/Homepage/Courses/Lessons/LessonPage";
+import TaskPage from "./Main/Homepage/Courses/Tasks/TaskPage";
 
 type Route = {
     path: string
@@ -47,6 +48,13 @@ const routes: Array<Route> = [
         exact: true,
         name: 'Lesson',
         component: LessonPage,
+        layout: MainLayout
+    },
+    {
+        path: '/courses/:courseId/modules/:moduleId/lessons/:lessonId/tasks/:id',
+        exact: true,
+        name: 'Task',
+        component: TaskPage,
         layout: MainLayout
     },
     {
