@@ -16,14 +16,24 @@ export const requestReducer = (state: RequestState = initialState, action: Reque
 
         case RequestActionTypes.FETCH_COURSE_REQUESTS:
         case RequestActionTypes.CREATE_COURSE_REQUEST:
+        case RequestActionTypes.ACCEPT_COURSE_REQUEST:
+        case RequestActionTypes.DELETE_COURSE_REQUEST:
             return setLoading()
 
         case RequestActionTypes.FETCH_COURSE_REQUESTS_ERROR:
         case RequestActionTypes.CREATE_COURSE_REQUEST_ERROR:
+        case RequestActionTypes.ACCEPT_COURSE_REQUEST_ERROR:
+        case RequestActionTypes.DELETE_COURSE_REQUEST_ERROR:
             return setError(action.payload)
 
         case RequestActionTypes.FETCH_COURSE_REQUESTS_SUCCESS:
             return setSuccess(action.payload)
+
+        case RequestActionTypes.DELETE_COURSE_REQUEST_SUCCESS:
+        case RequestActionTypes.ACCEPT_COURSE_REQUEST_SUCCESS:
+            return setSuccess(
+                state.requests.filter(request => request.id !== action.requestId)
+            )
 
         case RequestActionTypes.CREATE_COURSE_REQUEST_SUCCESS:
             return state

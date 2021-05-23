@@ -10,10 +10,12 @@ export interface Request {
 interface FetchCourseRequestsAction {
     type: RequestActionTypes.FETCH_COURSE_REQUESTS
 }
+
 interface FetchCourseRequestsSuccessAction {
     type: RequestActionTypes.FETCH_COURSE_REQUESTS_SUCCESS,
     payload: Array<Request>,
 }
+
 interface FetchCourseRequestsErrorAction {
     type: RequestActionTypes.FETCH_COURSE_REQUESTS_ERROR,
     payload: RequestError
@@ -22,12 +24,45 @@ interface FetchCourseRequestsErrorAction {
 interface CreateCourseRequestAction {
     type: RequestActionTypes.CREATE_COURSE_REQUEST
 }
+
 interface CreateCourseRequestSuccessAction {
     type: RequestActionTypes.CREATE_COURSE_REQUEST_SUCCESS,
     payload: Request
 }
+
 interface CreateCourseRequestErrorAction {
     type: RequestActionTypes.CREATE_COURSE_REQUEST_ERROR
+    payload: RequestError
+}
+
+interface AcceptCourseRequestAction {
+    type: RequestActionTypes.ACCEPT_COURSE_REQUEST
+}
+
+interface AcceptCourseRequestSuccessAction {
+    type: RequestActionTypes.ACCEPT_COURSE_REQUEST_SUCCESS,
+    courseId: number
+    requestId: number
+}
+
+interface AcceptCourseRequestErrorAction {
+    type: RequestActionTypes.ACCEPT_COURSE_REQUEST_ERROR
+    payload: RequestError
+}
+
+
+interface DeleteCourseRequestAction {
+    type: RequestActionTypes.DELETE_COURSE_REQUEST
+}
+
+interface DeleteCourseRequestSuccessAction {
+    type: RequestActionTypes.DELETE_COURSE_REQUEST_SUCCESS,
+    courseId: number
+    requestId: number
+}
+
+interface DeleteCourseRequestErrorAction {
+    type: RequestActionTypes.DELETE_COURSE_REQUEST_ERROR
     payload: RequestError
 }
 
@@ -45,13 +80,32 @@ export enum RequestActionTypes {
 
     CREATE_COURSE_REQUEST = 'REQUESTS/CREATE_COURSE_REQUEST',
     CREATE_COURSE_REQUEST_SUCCESS = 'REQUESTS/CREATE_COURSE_REQUEST_SUCCESS',
-    CREATE_COURSE_REQUEST_ERROR = 'REQUESTS/CREATE_COURSE_REQUEST_ERROR'
+    CREATE_COURSE_REQUEST_ERROR = 'REQUESTS/CREATE_COURSE_REQUEST_ERROR',
+
+
+    ACCEPT_COURSE_REQUEST = 'REQUESTS/ACCEPT_COURSE_REQUEST',
+    ACCEPT_COURSE_REQUEST_SUCCESS = 'REQUESTS/ACCEPT_COURSE_REQUEST_SUCCESS',
+    ACCEPT_COURSE_REQUEST_ERROR = 'REQUESTS/ACCEPT_COURSE_REQUEST_ERROR',
+
+
+    DELETE_COURSE_REQUEST = 'REQUESTS/ACCEPT_COURSE_REQUEST',
+    DELETE_COURSE_REQUEST_SUCCESS = 'REQUESTS/ACCEPT_COURSE_REQUEST_SUCCESS',
+    DELETE_COURSE_REQUEST_ERROR = 'REQUESTS/ACCEPT_COURSE_REQUEST_ERROR',
 }
 
 export type RequestAction =
+    DeleteCourseRequestAction |
+    DeleteCourseRequestSuccessAction |
+    DeleteCourseRequestErrorAction |
+
+    AcceptCourseRequestAction |
+    AcceptCourseRequestSuccessAction |
+    AcceptCourseRequestErrorAction |
+
     CreateCourseRequestAction |
     CreateCourseRequestSuccessAction |
     CreateCourseRequestErrorAction |
+
     FetchCourseRequestsAction |
     FetchCourseRequestsSuccessAction |
     FetchCourseRequestsErrorAction

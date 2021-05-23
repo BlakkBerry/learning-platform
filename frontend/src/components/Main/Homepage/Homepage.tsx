@@ -13,7 +13,7 @@ const Homepage = () => {
 
     const code = useRef<any>(null)
 
-    const {requests, error, loading} = useTypedSelector(state => state.requests)
+    const {error, loading} = useTypedSelector(state => state.requests)
     const {createCourseRequest, createCourse} = useActions()
 
     const [visible, setVisible] = useState(false);
@@ -139,15 +139,13 @@ const Homepage = () => {
     return (
         <>
             <div>
-                <div style={{position: "absolute", right: 0}} className="px-5 mr-3 float-right">
-                    <Button className="px-5 mr-3" type="primary" shape="round"
-                            onClick={showDrawer}
-                            icon={<PlusOutlined style={{verticalAlign: "baseline"}}/>}
-                            size='large'>Create</Button>
-                    <Button onClick={connect} className="px-5 mx-3" type="primary" shape="round"
-                            icon={<RetweetOutlined style={{verticalAlign: "baseline"}}/>}
-                            size='large'>Connect</Button>
-                </div>
+                <Button className="px-5 mr-3 float-right" type="primary" shape="round"
+                        onClick={showDrawer}
+                        icon={<PlusOutlined style={{verticalAlign: "baseline"}}/>}
+                        size='large'>Create</Button>
+                <Button onClick={connect} className="px-5 mx-3 float-right" type="primary" shape="round"
+                        icon={<RetweetOutlined style={{verticalAlign: "baseline"}}/>}
+                        size='large'>Connect</Button>
 
                 <Drawer
                     title="Enter course details"

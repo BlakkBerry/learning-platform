@@ -2,15 +2,18 @@ import React, {useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
 import {authAxios} from "../../../../utils/axios";
 import {Course} from "../../../../types/course";
+import {Request} from "../../../../types/request";
 import Modules from "./Modules/Modules";
-import {Button, Modal, Input, Menu, Spin, Form} from "antd";
+import {Button, Modal, Input, Menu, Spin, Form, Badge, Drawer, List, Avatar} from "antd";
 import {isAuthor} from "../../../../utils/functions";
 import {useTypedSelector} from "../../../../hooks/useTypedSelector";
 import {useActions} from "../../../../hooks/useActions";
 import {useHistory} from "react-router-dom";
-import {ExclamationCircleOutlined} from "@ant-design/icons";
+import {ExclamationCircleOutlined, CheckOutlined, CloseOutlined} from "@ant-design/icons";
 
 import "./CoursePage.css";
+import {AppDispatch, store, useAppDispatch} from "../../../../redux";
+import {fetchCourseRequests} from "../../../../redux/actions/request";
 
 const {SubMenu} = Menu;
 const {TextArea} = Input;
@@ -19,17 +22,16 @@ const CoursePage = () => {
 
     const {id}: any = useParams()
     const [course, setCourse] = useState<Course | null>(null)
+    const [courseRequests, setCourseRequests] = useState<Request[]>([])
     let [author, SetAuthor] = useState(false)
+    const [visible, setVisible] = useState(false);
 
-
-    const {requests, error, loading} = useTypedSelector(state => state.requests)
-    const {fetchCourseRequests} = useActions()
-    const {updateCourse} = useActions()
-    const {deleteCourse} = useActions()
-
+    const {error, loading} = useTypedSelector(state => state.requests)
+    const {updateCourse, deleteCourse, acceptCourseRequest, deleteCourseRequest} = useActions()
 
     const history = useHistory();
 
+    const dispatch: AppDispatch = useAppDispatch()
 
     useEffect(() => {
         authAxios.get<Course>(`/courses/${id}/`).then(res => {
@@ -37,16 +39,35 @@ const CoursePage = () => {
 
             if (isAuthor(res.data)) {
                 SetAuthor(true)
-                fetchCourseRequests(id)
+                dispatch(fetchCourseRequests(id)).then(() => {
+                    setCourseRequests(store.getState().requests.requests)
+                })
             }
         })
     }, [])
 
+    const acceptRequest = (request: Request) => {
+        try {
+            dispatch(acceptCourseRequest(id, request.id)).then()
+        } catch (e) {
 
-    if (!course) {
-        return <div className="spinner">
-            <Spin/>
-        </div>
+        }
+    }
+
+    const deleteRequest = (request: Request) => {
+        try {
+            dispatch(deleteCourseRequest(id, request.id)).then()
+        } catch (e) {
+
+        }
+    }
+
+    const showDrawer = () => {
+        setVisible(true)
+    }
+
+    const onClose = () => {
+        setVisible(false)
     }
 
     const update = (values: any) => {
@@ -70,10 +91,66 @@ const CoursePage = () => {
         })
     }
 
+    if (!course) {
+        return <div className="spinner">
+            <Spin/>
+        </div>
+    }
+
     return (
         <>
+
             <h1 style={{textAlign: 'center', fontSize: '2rem'}}>Course details</h1>
+
+            <Badge className="float-right" count={courseRequests?.length} style={{backgroundColor: '#2db7f5'}}>
+                <Button size='middle' onClick={showDrawer}>Requests</Button>
+            </Badge>
+            <Drawer
+                title="Requests"
+                placement="right"
+                onClose={onClose}
+                visible={visible}
+                width={"35vw"}
+                closable
+            >
+                <List
+                    itemLayout="vertical"
+                    dataSource={courseRequests}
+                    renderItem={request => (
+                        <List.Item>
+                            <List.Item.Meta
+                                avatar={
+                                    <Avatar style={{width: "55px", height: "55px"}}
+                                            src={request.student.photo ? request.student.photo
+                                                : "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png"}/>
+                                }
+                                title={
+                                    <div>
+                                        <div>{request.student.username ? request.student.username : `user${request.id}`}</div>
+                                        <div className="float-right">
+                                            <Button shape="circle" className="mx-1"
+                                                    onClick={() => acceptRequest(request)}>
+                                                <CheckOutlined
+                                                    style={{verticalAlign: "baseline", color: "#2db7f5"}}/>
+                                            </Button>
+
+                                            <Button shape="circle" className="mx-1" danger
+                                                    onClick={() => deleteRequest(request)}>
+                                                <CloseOutlined
+                                                    style={{verticalAlign: "baseline", paddingBottom: "4px"}}/>
+                                            </Button>
+
+                                        </div>
+                                    </div>}
+                                description={request.student.email}
+                            >
+                            </List.Item.Meta>
+                        </List.Item>
+                    )}
+                />
+            </Drawer>
             <Form
+                style={{paddingTop: "40px"}}
                 name="basic"
                 initialValues={{
                     remember: true,
