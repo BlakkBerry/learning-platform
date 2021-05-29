@@ -143,3 +143,23 @@ class Mark(models.Model):
     student = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     score = models.IntegerField(default=None, blank=True, null=True)
     max_score = models.IntegerField(blank=False)
+
+
+class Discussion(models.Model):
+    task = models.OneToOneField(Task, on_delete=models.CASCADE, primary_key=True)
+
+    def __str__(self):
+        return f'{self.task}_discussion'
+
+
+class DiscussionMessage(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    discussion = models.ForeignKey(Discussion, on_delete=models.CASCADE, related_name='messages')
+    text = models.TextField(null=True)
+    sent_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['sent_at']
+
+    def __str__(self):
+        return f'discussion_{self.discussion}_message_{self.id}'
