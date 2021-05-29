@@ -10,6 +10,7 @@ import {Button, DatePicker, Form, Input, Menu, Modal, notification, Spin} from "
 import {ExclamationCircleOutlined} from "@ant-design/icons";
 import {isAuthor} from "../../../../../utils/functions";
 import moment from 'moment';
+import TaskDiscussion from "./TaskDiscussion";
 
 const {SubMenu} = Menu;
 const {TextArea} = Input;
@@ -143,6 +144,7 @@ const TaskPage = () => {
                     </SubMenu>
                 </Menu>}
             </Form>
+            <TaskDiscussion />
             {/*HomeTasks*/}
         </>
     );

@@ -11,7 +11,7 @@ from .serializer import *
 class CourseAPI(viewsets.ModelViewSet):
     serializer_class = CourseSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        # permissions.IsAuthenticated
     ]
 
     def get_queryset(self):
@@ -51,7 +51,7 @@ class CourseAPI(viewsets.ModelViewSet):
 
 class CourseRequestAPI(viewsets.ModelViewSet):
     permission_classes = [
-        permissions.IsAuthenticated
+        # permissions.IsAuthenticated
     ]
 
     def get_serializer_class(self):
@@ -112,7 +112,7 @@ class CourseRequestAPI(viewsets.ModelViewSet):
 class ModuleAPI(viewsets.ModelViewSet):
     serializer_class = ModuleSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        # permissions.IsAuthenticated
     ]
 
     def get_queryset(self):
@@ -182,7 +182,7 @@ class ModuleAPI(viewsets.ModelViewSet):
 class LessonAPI(viewsets.ModelViewSet):
     serializer_class = LessonSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        # permissions.IsAuthenticated
     ]
 
     def get_queryset(self):
@@ -262,7 +262,7 @@ class LessonAPI(viewsets.ModelViewSet):
 class TaskAPI(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        # permissions.IsAuthenticated
     ]
 
     def get_queryset(self):
@@ -308,6 +308,10 @@ class TaskAPI(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         task = serializer.save(lesson=lesson)
+
+        # Create one-to-one related discussion
+        Discussion(task=task).save()
+
         return Response(serializer.data, status=status.HTTP_201_CREATED,
                         headers={'course_url': f'{request.build_absolute_uri()}{task.id}'})
 
@@ -345,7 +349,7 @@ class TaskAPI(viewsets.ModelViewSet):
 class HomeTaskAPI(viewsets.ModelViewSet):
     serializer_class = HomeTaskSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        # permissions.IsAuthenticated
     ]
 
     def get_queryset(self):
@@ -767,7 +771,7 @@ class HomeTaskItemBaseAPI(viewsets.ModelViewSet):
 class TaskTextAPI(TaskItemBaseAPI):
     serializer_class = TaskTextSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        # permissions.IsAuthenticated
     ]
     base_model = TaskText
 
@@ -775,7 +779,7 @@ class TaskTextAPI(TaskItemBaseAPI):
 class TaskFileAPI(TaskItemBaseAPI):
     serializer_class = TaskFileSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        # permissions.IsAuthenticated
     ]
     base_model = TaskFile
 
@@ -783,7 +787,7 @@ class TaskFileAPI(TaskItemBaseAPI):
 class TaskImageAPI(TaskItemBaseAPI):
     serializer_class = TaskImageSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        # permissions.IsAuthenticated
     ]
     base_model = TaskImage
 
@@ -791,7 +795,7 @@ class TaskImageAPI(TaskItemBaseAPI):
 class TaskVideoAPI(TaskItemBaseAPI):
     serializer_class = TaskVideoSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        # permissions.IsAuthenticated
     ]
     base_model = TaskVideo
 
@@ -799,7 +803,7 @@ class TaskVideoAPI(TaskItemBaseAPI):
 class HomeTaskTextAPI(HomeTaskItemBaseAPI):
     serializer_class = HomeTaskTextSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        # permissions.IsAuthenticated
     ]
     base_model = HomeTaskText
 
@@ -807,7 +811,7 @@ class HomeTaskTextAPI(HomeTaskItemBaseAPI):
 class HomeTaskFileAPI(HomeTaskItemBaseAPI):
     serializer_class = HomeTaskFileSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        # permissions.IsAuthenticated
     ]
     base_model = HomeTaskFile
 
@@ -815,7 +819,7 @@ class HomeTaskFileAPI(HomeTaskItemBaseAPI):
 class HomeTaskImageAPI(HomeTaskItemBaseAPI):
     serializer_class = HomeTaskImageSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        # permissions.IsAuthenticated
     ]
     base_model = HomeTaskImage
 
@@ -823,7 +827,7 @@ class HomeTaskImageAPI(HomeTaskItemBaseAPI):
 class HomeTaskVideoAPI(HomeTaskItemBaseAPI):
     serializer_class = HomeTaskVideoSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        # permissions.IsAuthenticated
     ]
     base_model = HomeTaskVideo
 
@@ -831,7 +835,7 @@ class HomeTaskVideoAPI(HomeTaskItemBaseAPI):
 class MarkAPI(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = MarkSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        # permissions.IsAuthenticated
     ]
 
     def get_queryset(self):
@@ -868,7 +872,7 @@ class MarkAPI(viewsets.GenericViewSet, mixins.ListModelMixin):
 class AllAuthorCoursesView(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = AllAuthorCoursesSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        # permissions.IsAuthenticated
     ]
 
     def get_queryset(self):
@@ -878,7 +882,7 @@ class AllAuthorCoursesView(viewsets.GenericViewSet, mixins.ListModelMixin):
 class AllStudentCoursesView(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = AllStudentCoursesSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        # permissions.IsAuthenticated
     ]
 
     def get_queryset(self):

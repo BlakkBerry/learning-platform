@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'knox',
     'accounts',
+    'channels'
 ]
 
 REST_FRAMEWORK = {
@@ -91,6 +92,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
+ASGI_APPLICATION = 'courses.routing.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
@@ -153,3 +155,9 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 # Activate Django-Heroku.
 django_heroku.settings(config=locals(), staticfiles=False, logging=True)
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+    }
+}
