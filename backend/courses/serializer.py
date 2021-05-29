@@ -45,6 +45,23 @@ class CourseRequestSerializer(serializers.ModelSerializer):
         return value
 
 
+class DiscussionMessageSerializer(serializers.ModelSerializer):
+    user = CustomUserSerializer()
+
+    class Meta:
+        model = DiscussionMessage
+        fields = '__all__'
+
+    def to_internal_value(self, data):
+        user = CustomUser.objects.get(pk=data.get('user'))
+        discussion = Discussion.objects.get(pk=data.get('discussion'))
+
+        data['user'] = user
+        data['discussion'] = discussion
+
+        return data
+
+
 class CourseAuthorRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseRequest

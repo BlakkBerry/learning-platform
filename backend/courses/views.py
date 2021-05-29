@@ -308,6 +308,10 @@ class TaskAPI(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         task = serializer.save(lesson=lesson)
+
+        # Create one-to-one related discussion
+        Discussion(task=task).save()
+
         return Response(serializer.data, status=status.HTTP_201_CREATED,
                         headers={'course_url': f'{request.build_absolute_uri()}{task.id}'})
 
