@@ -31,3 +31,7 @@ images/
 
 # db volume
 db_data/
+
+# static files
+static/
+staticfiles/
