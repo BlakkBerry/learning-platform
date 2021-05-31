@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useRef} from "react";
 import {TaskDiscussionMessage} from "../types/task";
 
-type sendMessageType = (message: TaskDiscussionMessage) => void
+type sendMessageType = (message: string) => void
 type websocketEventCallbackType = (event: any) => void
 type useWebSocketType = (url: string,
                          onMessage: websocketEventCallbackType,
@@ -24,6 +24,11 @@ export const useWebSocket: useWebSocketType = (url, onMessage, onOpen = null, on
     }, [])
 
     return useCallback(message => {
-        wsRef.current?.send(JSON.stringify(message))
+        const discussionMessage: TaskDiscussionMessage = {text: message}
+
+        if (message === '')
+            return
+
+        wsRef.current?.send(JSON.stringify(discussionMessage))
     }, [wsRef])
 };
