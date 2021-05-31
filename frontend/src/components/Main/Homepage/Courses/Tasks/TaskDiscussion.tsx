@@ -1,9 +1,7 @@
-import {FC, useEffect, useState} from "react"
+import {FC, useState} from "react"
 import Cookies from "universal-cookie";
 import {TaskDiscussionMessage} from "../../../../../types/task";
 import {useWebSocket} from "../../../../../hooks/useWebSocket";
-
-let ws: WebSocket
 
 interface TaskDiscussionProps {
     courseId: number
@@ -16,7 +14,7 @@ const TaskDiscussion: FC<TaskDiscussionProps> = ({courseId, moduleId, lessonId, 
 
     const [messages, setMessages] = useState<TaskDiscussionMessage[]>([]);
     const sendMessage = useWebSocket(`ws://localhost:8000/ws/discussion/${courseId}/${moduleId}/${lessonId}/${taskId}/${new Cookies().get('Token')}/`,
-        (event: any) => {
+        event => {
             const messages: TaskDiscussionMessage[] | TaskDiscussionMessage = JSON.parse(event.data)
 
             setMessages(prev => prev.concat(messages))

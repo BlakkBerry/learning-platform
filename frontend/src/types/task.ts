@@ -12,11 +12,11 @@ export interface Task {
 }
 
 export interface TaskDiscussionMessage {
-    id: number
-    user: User
-    discussion: number
+    id?: number
+    user?: User
+    discussion?: number
     text: string | number
-    sent_at: Date
+    sent_at?: Date
 }
 
 interface FetchTasksAction {

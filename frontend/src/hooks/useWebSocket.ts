@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useRef} from "react";
 import {TaskDiscussionMessage} from "../types/task";
 
-type sendMessageType = (message: Partial<TaskDiscussionMessage>) => void
+type sendMessageType = (message: TaskDiscussionMessage) => void
 type websocketEventCallbackType = (event: any) => void
 type useWebSocketType = (url: string,
                          onMessage: websocketEventCallbackType,
