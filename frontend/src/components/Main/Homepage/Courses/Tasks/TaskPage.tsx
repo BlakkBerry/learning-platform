@@ -144,7 +144,7 @@ const TaskPage = () => {
                     </SubMenu>
                 </Menu>}
             </Form>
-            <TaskDiscussion />
+            <TaskDiscussion  courseId={courseId} moduleId={moduleId} lessonId={lessonId} taskId={id}/>
             {/*HomeTasks*/}
         </>
     );

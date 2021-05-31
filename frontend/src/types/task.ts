@@ -1,5 +1,6 @@
 import {HomeTask} from "./hometask";
 import {RequestError} from "./error";
+import {User} from "./user";
 
 export interface Task {
     id?: number
@@ -8,6 +9,14 @@ export interface Task {
     max_score: number
     due_date?: Date
     homeTasks?: Array<HomeTask>
+}
+
+export interface TaskDiscussionMessage {
+    id: number
+    user: User
+    discussion: number
+    text: string | number
+    sent_at: Date
 }
 
 interface FetchTasksAction {
