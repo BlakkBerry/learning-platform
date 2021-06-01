@@ -3,7 +3,6 @@ import {useTypedSelector} from "../../../../../hooks/useTypedSelector";
 import {useActions} from "../../../../../hooks/useActions";
 import {Button, Drawer, Form, Input, List, notification, Spin} from "antd";
 import {Link} from "react-router-dom";
-import LessonItem from "./LessonItem";
 import {PlusOutlined, ExclamationCircleOutlined} from "@ant-design/icons";
 import {RequestError} from "../../../../../types/error";
 import {Lesson} from "../../../../../types/lesson";
@@ -123,21 +122,14 @@ const Lessons: FC<LessonsProps> = ({courseId, moduleId, author}) => {
         </Drawer>
         <h1 style={{textAlign: 'center', fontSize: '2rem'}}>Lessons</h1>
         <List
-            grid={{
-                gutter: 16,
-                xs: 1,
-                sm: 2,
-                md: 4,
-                lg: 4,
-                xl: 4,
-                xxl: 4
-            }}
+            itemLayout="horizontal"
             dataSource={lessons}
             renderItem={lesson => (
                 <List.Item>
-                    <Link to={`/courses/${courseId}/modules/${moduleId}/lessons/${lesson.id}`}>
-                        <LessonItem {...lesson}/>
-                    </Link>
+                    <List.Item.Meta
+                        title={<Link to={`/courses/${courseId}/modules/${moduleId}/lessons/${lesson.id}`}>{lesson.name}</Link>}
+                        description={lesson.description}
+                    />
                 </List.Item>
             )}
         />

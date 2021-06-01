@@ -5,8 +5,8 @@ import {useActions} from "../../../../../hooks/useActions";
 import {Button, DatePicker, Drawer, Form, Input, List, notification, Spin} from "antd";
 import {ExclamationCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import {Link} from "react-router-dom";
-import TaskItem from "./TaskItem";
 import {Task} from "../../../../../types/task";
+import moment from "moment";
 
 const {TextArea} = Input;
 
@@ -156,21 +156,15 @@ const Tasks: FC<TasksProps> = ({courseId, moduleId, lessonId, author}) => {
 
             <h1 style={{textAlign: 'center', fontSize: '2rem'}}>Tasks</h1>
             <List
-                grid={{
-                    gutter: 16,
-                    xs: 1,
-                    sm: 2,
-                    md: 4,
-                    lg: 4,
-                    xl: 4,
-                    xxl: 4
-                }}
+                itemLayout="horizontal"
                 dataSource={tasks}
                 renderItem={task => (
                     <List.Item>
-                        <Link to={`/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/tasks/${task.id}`}>
-                            <TaskItem {...task}/>
-                        </Link>
+                        <List.Item.Meta
+                            title={<Link to={`/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/tasks/${task.id}`}>{task.name}</Link>}
+                            description={task.description}
+                        />
+                        <span style={{color: "rgba(0, 0, 0, 0.45)"}}>{'Due to: ' + moment(task.due_date).format('YYYY-MM-DD')}</span>
                     </List.Item>
                 )}
             />

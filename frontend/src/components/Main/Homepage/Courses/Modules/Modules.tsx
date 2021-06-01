@@ -3,7 +3,6 @@ import {useTypedSelector} from "../../../../../hooks/useTypedSelector";
 import {useActions} from "../../../../../hooks/useActions";
 import {Button, Drawer, Form, Input, List, notification, Spin} from "antd";
 import {Link} from "react-router-dom";
-import ModuleItem from "./ModuleItem";
 import {PlusOutlined, ExclamationCircleOutlined} from "@ant-design/icons";
 import {Module} from "../../../../../types/module";
 import {RequestError} from "../../../../../types/error";
@@ -123,21 +122,14 @@ const Modules: FC<ModulesProps> = ({courseId, author}) => {
         </Drawer>
         <h1 style={{textAlign: 'center', fontSize: '2rem'}}>Modules</h1>
         <List
-            grid={{
-                gutter: 16,
-                xs: 1,
-                sm: 2,
-                md: 4,
-                lg: 4,
-                xl: 4,
-                xxl: 4
-            }}
+            itemLayout="horizontal"
             dataSource={modules}
             renderItem={module => (
                 <List.Item>
-                    <Link to={`/courses/${courseId}/modules/${module.id}`}>
-                        <ModuleItem {...module}/>
-                    </Link>
+                    <List.Item.Meta
+                        title={<Link to={`/courses/${courseId}/modules/${module.id}`}>{module.name}</Link>}
+                        description={module.description}
+                    />
                 </List.Item>
             )}
         />
