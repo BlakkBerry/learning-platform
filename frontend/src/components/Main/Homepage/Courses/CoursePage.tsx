@@ -12,8 +12,6 @@ import {useHistory} from "react-router-dom";
 import {ExclamationCircleOutlined, CheckOutlined, CloseOutlined} from "@ant-design/icons";
 
 import "./CoursePage.css";
-import {AppDispatch, store, useAppDispatch} from "../../../../redux";
-import {fetchCourseRequests} from "../../../../redux/actions/request";
 
 const {SubMenu} = Menu;
 const {TextArea} = Input;
@@ -22,16 +20,13 @@ const CoursePage = () => {
 
     const {id}: any = useParams()
     const [course, setCourse] = useState<Course | null>(null)
-    const [courseRequests, setCourseRequests] = useState<Request[]>([])
     let [author, SetAuthor] = useState(false)
     const [visible, setVisible] = useState(false);
 
-    const {error, loading} = useTypedSelector(state => state.requests)
-    const {updateCourse, deleteCourse, acceptCourseRequest, deleteCourseRequest} = useActions()
+    const {requests, loading} = useTypedSelector(state => state.requests)
+    const {updateCourse, deleteCourse, acceptCourseRequest, deleteCourseRequest, fetchCourseRequests} = useActions()
 
     const history = useHistory();
-
-    const dispatch: AppDispatch = useAppDispatch()
 
     useEffect(() => {
         authAxios.get<Course>(`/courses/${id}/`).then(res => {
@@ -39,27 +34,17 @@ const CoursePage = () => {
 
             if (isAuthor(res.data)) {
                 SetAuthor(true)
-                dispatch(fetchCourseRequests(id)).then(() => {
-                    setCourseRequests(store.getState().requests.requests)
-                })
+                fetchCourseRequests(id)
             }
         })
     }, [])
 
     const acceptRequest = (request: Request) => {
-        try {
-            dispatch(acceptCourseRequest(id, request.id)).then()
-        } catch (e) {
-
-        }
+        acceptCourseRequest(id, request.id)
     }
 
     const deleteRequest = (request: Request) => {
-        try {
-            dispatch(deleteCourseRequest(id, request.id)).then()
-        } catch (e) {
-
-        }
+        deleteCourseRequest(id, request.id)
     }
 
     const showDrawer = () => {
@@ -102,9 +87,9 @@ const CoursePage = () => {
 
             <h1 style={{textAlign: 'center', fontSize: '2rem'}}>Course details</h1>
 
-            <Badge className="float-right" count={courseRequests?.length} style={{backgroundColor: '#2db7f5'}}>
+            {author && <Badge className="float-right" count={requests?.length} style={{backgroundColor: '#2db7f5'}}>
                 <Button size='middle' onClick={showDrawer}>Requests</Button>
-            </Badge>
+            </Badge>}
             <Drawer
                 title="Requests"
                 placement="right"
@@ -115,10 +100,10 @@ const CoursePage = () => {
             >
                 <List
                     itemLayout="vertical"
-                    dataSource={courseRequests}
+                    dataSource={requests}
                     renderItem={request => (
                         <List.Item>
-                            <List.Item.Meta
+                            {!loading ? <List.Item.Meta
                                 avatar={
                                     <Avatar style={{width: "55px", height: "55px"}}
                                             src={request.student.photo ? request.student.photo
@@ -144,7 +129,7 @@ const CoursePage = () => {
                                     </div>}
                                 description={request.student.email}
                             >
-                            </List.Item.Meta>
+                            </List.Item.Meta> : <div className="spinner"><Spin/></div>}
                         </List.Item>
                     )}
                 />

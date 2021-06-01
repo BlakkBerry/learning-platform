@@ -36,7 +36,7 @@ export const requestReducer = (state: RequestState = initialState, action: Reque
             )
 
         case RequestActionTypes.CREATE_COURSE_REQUEST_SUCCESS:
-            return state
+            return setSuccess(state.requests)
 
         default:
             return state
