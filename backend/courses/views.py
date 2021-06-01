@@ -1,10 +1,6 @@
-import os
+from rest_framework import permissions
 
-from django.conf import settings
-from django.db.models import Q
-from rest_framework import viewsets, permissions, status, mixins
-from rest_framework.response import Response
-
+from .mixins import *
 from .serializer import *
 
 
@@ -27,7 +23,7 @@ class CourseAPI(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        if request.user == instance.author:
+        if is_author(self.request.user, kwargs['pk']):
             serializer = self.get_serializer(instance, data=request.data)
             serializer.is_valid(raise_exception=True)
             self.perform_update(serializer)
@@ -38,13 +34,8 @@ class CourseAPI(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        if request.user != instance.author:
-            students = [student for student in instance.students.get_queryset()]
-            if request.user in students:
-                return Response(status=status.HTTP_403_FORBIDDEN,
-                                data={'detail': 'Authentication credentials were not provided.'})
-            else:
-                return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
+        if not is_author(self.request.user, kwargs['pk']):
+            return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -61,8 +52,10 @@ class CourseRequestAPI(viewsets.ModelViewSet):
             return CourseAuthorRequestSerializer
 
     def get_queryset(self):
-        user = self.request.user.id
-        return CourseRequest.objects.filter(course__author=user)
+        return CourseRequest.objects.filter(course__author=self.request.user.id)
+
+    def get_instance(self, **kwargs):
+        return get_object_or_404(CourseRequest, course__pk=kwargs['pk'], pk=kwargs['rpk'])
 
     def retrieve(self, request, *args, **kwargs):
         queryset = self.get_queryset().filter(course=kwargs['pk'])
@@ -71,8 +64,7 @@ class CourseRequestAPI(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def list(self, request, *args, **kwargs):
-        user = self.request.user.id
-        course = get_object_or_404(Course, pk=kwargs['pk'], author=user)
+        course = get_object_or_404(Course, pk=kwargs['pk'], author=self.request.user.id)
         queryset = self.get_queryset().filter(course=course)
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -83,15 +75,13 @@ class CourseRequestAPI(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def update(self, request, *args, **kwargs):
-        instance = get_object_or_404(CourseRequest, course__pk=kwargs['pk'], pk=kwargs['rpk'])
-
-        if self.request.user == instance.course.author:
+        instance = self.get_instance(**kwargs)
+        if is_author(self.request.user, kwargs['pk']):
             instance.course.students.add(instance.student)
             instance.course.save()
             self.perform_destroy(instance)
             return Response(status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
+        return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -101,12 +91,11 @@ class CourseRequestAPI(viewsets.ModelViewSet):
         return Response(status=status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
-        instance = get_object_or_404(CourseRequest, course__pk=kwargs['pk'], pk=kwargs['rpk'])
-        if self.request.user == instance.course.author:
+        instance = self.get_instance(**kwargs)
+        if is_author(self.request.user, kwargs['pk']):
             self.perform_destroy(instance)
             return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
+        return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
 
 
 class ModuleAPI(viewsets.ModelViewSet):
@@ -475,47 +464,6 @@ class HomeTaskAPI(viewsets.ModelViewSet):
             return Response(serializer.data)
 
         return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
-        # task = get_object_or_404(Task,
-        #                          pk=kwargs['tpk'],
-        #                          lesson__pk=kwargs['lpk'],
-        #                          lesson__module__pk=kwargs['mpk'],
-        #                          lesson__module__course__pk=kwargs['pk'])
-        #
-        # instance = self.get_queryset().filter(
-        #     Q(assignment=task, assignment__lesson__module__course__students=request.user) |
-        #     Q(assignment=task, assignment__lesson__module__course__author=request.user))
-        #
-        # if not instance:
-        #     return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
-        # students = [student for student in
-        #             get_object_or_404(self.get_queryset(),
-        #                               pk=kwargs['htpk']).assignment.lesson.module.course.students.get_queryset()]
-        #
-        # if request.user in students:
-        #     instance = instance.filter(owner=request.user).get()
-        #     if instance.assignment.due_date >= datetime.now().date():
-        #         serializer = self.get_serializer(instance, data=request.data)
-        #         serializer.is_valid(raise_exception=True)
-        #         self.perform_update(serializer)
-        #         return Response(serializer.data)
-        # if request.user == instance.assignment.lesson.module.course.author:
-        #     serializer = self.get_serializer(instance, data=request.data)
-        #     serializer.is_valid(raise_exception=True)
-        #     self.perform_update(serializer)
-        #     m = instance.assignment.mark_set
-        #     if len(m.all()):
-        #         m = m.get()
-        #         m.task = instance.assignment
-        #         m.student = instance.owner
-        #         m.score = instance.mark
-        #         m.max_score = instance.assignment.max_score
-        #         m.save()
-        #     else:
-        #         mark = Mark(task=instance.assignment, student=instance.owner, score=instance.mark,
-        #                     max_score=instance.assignment.max_score)
-        #         mark.save()
-        #     return Response(serializer.data)
-        # return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
         instance = get_object_or_404(HomeTask, pk=kwargs['htpk'],
@@ -534,241 +482,7 @@ class HomeTaskAPI(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class TaskItemBaseAPI(viewsets.ModelViewSet):
-    base_model = ItemBase
-
-    def get_queryset(self):
-        user = self.request.user
-        return self.base_model.objects.filter(
-            Q(task__lesson__module__course__author=user) |
-            Q(task__lesson__module__course__students=user)) \
-            .order_by('id').distinct('id')
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset().filter(
-            task__lesson__module__course__pk=kwargs['pk'],
-            task__lesson__module__pk=kwargs['mpk'],
-            task__lesson__pk=kwargs['lpk'],
-            task__pk=kwargs['tpk'])
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-    def retrieve(self, request, *args, **kwargs):
-        queryset = self.get_queryset().filter(
-            task__lesson__module__course__pk=kwargs['pk'],
-            task__lesson__module__pk=kwargs['mpk'],
-            task__lesson__pk=kwargs['lpk'],
-            task__pk=kwargs['tpk'])
-        instance = get_object_or_404(queryset, pk=kwargs['file_pk'])
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
-
-    def create(self, request, *args, **kwargs):
-        course = get_object_or_404(Course, pk=kwargs['pk'])
-        task = get_object_or_404(Task,
-                                 pk=kwargs['tpk'],
-                                 lesson__pk=kwargs['lpk'],
-                                 lesson__module__pk=kwargs['mpk'],
-                                 lesson__module__course__pk=kwargs['pk'])
-        if course.author != request.user:
-            return Response(status=status.HTTP_403_FORBIDDEN,
-                            data={'detail': 'Authentication credentials were not provided.'})
-
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        text = serializer.save(task=task)
-        return Response(serializer.data, status=status.HTTP_201_CREATED,
-                        headers={'course_url': f'{request.build_absolute_uri()}{text.id}'})
-
-    def update(self, request, *args, **kwargs):
-        instance = get_object_or_404(self.base_model,
-                                     task__lesson__module__course__pk=kwargs['pk'],
-                                     task__lesson__module__pk=kwargs['mpk'],
-                                     task__lesson__pk=kwargs['lpk'],
-                                     task__pk=kwargs['tpk'],
-                                     pk=kwargs['file_pk'])
-
-        if request.user != instance.task.lesson.module.course.author:
-            students = [student for student in instance.task.lesson.module.course.students.get_queryset()]
-            if request.user in students:
-                return Response(status=status.HTTP_403_FORBIDDEN,
-                                data={'detail': 'Authentication credentials were not provided.'})
-            else:
-                return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
-
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
-
-    def destroy(self, request, *args, **kwargs):
-        instance = get_object_or_404(self.base_model,
-                                     task__lesson__module__course__pk=kwargs['pk'],
-                                     task__lesson__module__pk=kwargs['mpk'],
-                                     task__lesson__pk=kwargs['lpk'],
-                                     task__pk=kwargs['tpk'],
-                                     pk=kwargs['file_pk'])
-
-        if request.user != instance.task.lesson.module.course.author:
-            students = [student for student in instance.task.lesson.module.course.students.get_queryset()]
-            if request.user in students:
-                return Response(status=status.HTTP_403_FORBIDDEN,
-                                data={'detail': 'Authentication credentials were not provided.'})
-            else:
-                return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
-
-        file_path = os.path.join(settings.BASE_DIR, str(instance.file_item))
-        if os.path.exists(file_path):
-            os.remove(file_path)
-            self.perform_destroy(instance)
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-class HomeTaskItemBaseAPI(viewsets.ModelViewSet):
-    base_model = ItemBase
-
-    def get_queryset(self):
-        user = self.request.user
-        return self.base_model.objects.filter(
-            Q(task__assignment__lesson__module__course__author=user) |
-            Q(task__assignment__lesson__module__course__students=user)) \
-            .order_by('id').distinct('id')
-
-    def list(self, request, *args, **kwargs):
-        user = self.request.user
-        home_task = get_object_or_404(HomeTask,
-                                      pk=kwargs['htpk'],
-                                      assignment__pk=kwargs['tpk'],
-                                      assignment__lesson__pk=kwargs['lpk'],
-                                      assignment__lesson__module__pk=kwargs['mpk'],
-                                      assignment__lesson__module__course__pk=kwargs['pk'])
-
-        queryset = self.get_queryset().filter(
-            Q(task=home_task, task__assignment__lesson__module__course__students=user) |
-            Q(task=home_task, task__assignment__lesson__module__course__author=user))
-        students = [student for student in home_task.assignment.lesson.module.course.students.get_queryset()]
-
-        if user in students:
-            queryset = queryset.filter(task__owner=user)
-            if len(queryset) == 0:
-                return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-    def retrieve(self, request, *args, **kwargs):
-        user = self.request.user
-
-        home_task = get_object_or_404(HomeTask,
-                                      pk=kwargs['htpk'],
-                                      assignment__pk=kwargs['tpk'],
-                                      assignment__lesson__pk=kwargs['lpk'],
-                                      assignment__lesson__module__pk=kwargs['mpk'],
-                                      assignment__lesson__module__course__pk=kwargs['pk'])
-
-        queryset = self.get_queryset().filter(
-            Q(task=home_task, task__assignment__lesson__module__course__students=user) |
-            Q(task=home_task, task__assignment__lesson__module__course__author=user))
-        students = [student for student in home_task.assignment.lesson.module.course.students.get_queryset()]
-
-        if user in students:
-            queryset = queryset.filter(task__owner=user)
-        instance = get_object_or_404(queryset, pk=kwargs['file_pk'])
-
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
-
-    def create(self, request, *args, **kwargs):
-        user = self.request.user
-        course = get_object_or_404(Course, pk=kwargs['pk'])
-        home_task = get_object_or_404(HomeTask,
-                                      pk=kwargs['htpk'],
-                                      assignment__pk=kwargs['tpk'],
-                                      assignment__lesson__pk=kwargs['lpk'],
-                                      assignment__lesson__module__pk=kwargs['mpk'],
-                                      assignment__lesson__module__course__pk=kwargs['pk'])
-
-        students = [student for student in home_task.assignment.lesson.module.course.students.get_queryset()]
-
-        if user == course.author:
-            return Response(status=status.HTTP_400_BAD_REQUEST,
-                            data={'detail': 'Only students can create files to homeworks.'})
-
-        if user in students:
-            if home_task.assignment.due_date >= datetime.now().date():
-                if home_task.owner == user:
-                    serializer = self.get_serializer(data=request.data)
-                    serializer.is_valid(raise_exception=True)
-                    text = serializer.save(task=home_task)
-                    return Response(serializer.data, status=status.HTTP_201_CREATED,
-                                    headers={'course_url': f'{request.build_absolute_uri()}{text.id}'})
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-
-    def update(self, request, *args, **kwargs):
-        user = self.request.user
-        instance = get_object_or_404(self.base_model,
-                                     task__assignment__lesson__module__course__pk=kwargs['pk'],
-                                     task__assignment__lesson__module__pk=kwargs['mpk'],
-                                     task__assignment__lesson__pk=kwargs['lpk'],
-                                     task__assignment__pk=kwargs['tpk'],
-                                     task__pk=kwargs['htpk'],
-                                     pk=kwargs['file_pk'])
-
-        students = [student for student in instance.task.assignment.lesson.module.course.students.get_queryset()]
-
-        if user == instance.task.assignment.lesson.module.course.author:
-            return Response(status=status.HTTP_400_BAD_REQUEST,
-                            data={'detail': 'Only students can modify files to homeworks.'})
-
-        if user in students:
-            if instance.task.assignment.due_date >= datetime.now().date():
-                if instance.task.owner == user:
-                    serializer = self.get_serializer(instance, data=request.data, partial=True)
-                    serializer.is_valid(raise_exception=True)
-                    self.perform_update(serializer)
-                    return Response(serializer.data)
-                else:
-                    return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-
-    def destroy(self, request, *args, **kwargs):
-        user = self.request.user
-        instance = get_object_or_404(self.base_model,
-                                     task__assignment__lesson__module__course__pk=kwargs['pk'],
-                                     task__assignment__lesson__module__pk=kwargs['mpk'],
-                                     task__assignment__lesson__pk=kwargs['lpk'],
-                                     task__assignment__pk=kwargs['tpk'],
-                                     task__pk=kwargs['htpk'],
-                                     pk=kwargs['file_pk'])
-
-        students = [student for student in instance.task.assignment.lesson.module.course.students.get_queryset()]
-
-        if user == instance.task.assignment.lesson.module.course.author:
-            return Response(status=status.HTTP_400_BAD_REQUEST,
-                            data={'detail': 'Only students can delete files to homeworks.'})
-
-        if user in students and instance.task.owner == user:
-            file_path = os.path.join(settings.BASE_DIR, str(instance.file_item))
-            if os.path.exists(file_path):
-                os.remove(file_path)
-                self.perform_destroy(instance)
-                return Response(status=status.HTTP_204_NO_CONTENT)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
-
-
-class TaskTextAPI(TaskItemBaseAPI):
+class TaskTextAPI(TaskItemBaseMixin, viewsets.GenericViewSet):
     serializer_class = TaskTextSerializer
     permission_classes = [
         permissions.IsAuthenticated
@@ -776,7 +490,7 @@ class TaskTextAPI(TaskItemBaseAPI):
     base_model = TaskText
 
 
-class TaskFileAPI(TaskItemBaseAPI):
+class TaskFileAPI(TaskItemBaseMixin, viewsets.GenericViewSet):
     serializer_class = TaskFileSerializer
     permission_classes = [
         permissions.IsAuthenticated
@@ -784,7 +498,7 @@ class TaskFileAPI(TaskItemBaseAPI):
     base_model = TaskFile
 
 
-class TaskImageAPI(TaskItemBaseAPI):
+class TaskImageAPI(TaskItemBaseMixin, viewsets.GenericViewSet):
     serializer_class = TaskImageSerializer
     permission_classes = [
         permissions.IsAuthenticated
@@ -792,7 +506,7 @@ class TaskImageAPI(TaskItemBaseAPI):
     base_model = TaskImage
 
 
-class TaskVideoAPI(TaskItemBaseAPI):
+class TaskVideoAPI(TaskItemBaseMixin, viewsets.GenericViewSet):
     serializer_class = TaskVideoSerializer
     permission_classes = [
         permissions.IsAuthenticated
@@ -800,7 +514,7 @@ class TaskVideoAPI(TaskItemBaseAPI):
     base_model = TaskVideo
 
 
-class HomeTaskTextAPI(HomeTaskItemBaseAPI):
+class HomeTaskTextAPI(HomeTaskItemBaseMixin, viewsets.GenericViewSet):
     serializer_class = HomeTaskTextSerializer
     permission_classes = [
         permissions.IsAuthenticated
@@ -808,7 +522,7 @@ class HomeTaskTextAPI(HomeTaskItemBaseAPI):
     base_model = HomeTaskText
 
 
-class HomeTaskFileAPI(HomeTaskItemBaseAPI):
+class HomeTaskFileAPI(HomeTaskItemBaseMixin, viewsets.GenericViewSet):
     serializer_class = HomeTaskFileSerializer
     permission_classes = [
         permissions.IsAuthenticated
@@ -816,7 +530,7 @@ class HomeTaskFileAPI(HomeTaskItemBaseAPI):
     base_model = HomeTaskFile
 
 
-class HomeTaskImageAPI(HomeTaskItemBaseAPI):
+class HomeTaskImageAPI(HomeTaskItemBaseMixin, viewsets.GenericViewSet):
     serializer_class = HomeTaskImageSerializer
     permission_classes = [
         permissions.IsAuthenticated
@@ -824,7 +538,7 @@ class HomeTaskImageAPI(HomeTaskItemBaseAPI):
     base_model = HomeTaskImage
 
 
-class HomeTaskVideoAPI(HomeTaskItemBaseAPI):
+class HomeTaskVideoAPI(HomeTaskItemBaseMixin, viewsets.GenericViewSet):
     serializer_class = HomeTaskVideoSerializer
     permission_classes = [
         permissions.IsAuthenticated
@@ -854,10 +568,9 @@ class MarkAPI(viewsets.GenericViewSet, mixins.ListModelMixin):
             Q(task__lesson__module__course=course, task__lesson__module__course__students=user) |
             Q(task__lesson__module__course=course, task__lesson__module__course__author=user))
 
-        students = [student for student in course.students.get_queryset()]
-        if user not in students and user != course.author:
+        if not is_student(self.request.user, kwargs['pk']) and not is_author(self.request.user, kwargs['pk']):
             return Response(status=status.HTTP_404_NOT_FOUND, data={'detail': 'Not found.'})
-        if user in students:
+        if is_student(self.request.user, kwargs['pk']):
             queryset = queryset.filter(student=user)
 
         page = self.paginate_queryset(queryset)

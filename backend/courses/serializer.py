@@ -39,7 +39,7 @@ class CourseRequestSerializer(serializers.ModelSerializer):
         author = self.context['request'].user.id
         if author == course.author.id or author in students:
             raise serializers.ValidationError('you are already in this course')
-        student_r = [request.student.id for request in CourseRequest.objects.all()]
+        student_r = [request.student.id for request in CourseRequest.objects.filter(course=course)]
         if author in student_r:
             raise serializers.ValidationError('you have already requested this course')
         return value

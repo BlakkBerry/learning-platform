@@ -1,6 +1,9 @@
 import os
 
-import magic
+try:
+    import magic
+except ImportError:
+    from winmagic import magic
 from django.conf import settings
 from django.http import HttpResponse, Http404
 
