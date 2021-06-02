@@ -11,77 +11,84 @@ import {isAuthor} from "../../../../../utils/functions";
 import moment from 'moment';
 import TaskDiscussion from "./TaskDiscussion";
 import HomeTaskModal from "./HomeworkModal";
+import HomeworkReview from "./HomeworkReview";
 
 const {SubMenu} = Menu;
 const {TextArea} = Input;
 const {Panel} = Collapse
 
 const TaskPage = () => {
-        const {courseId, moduleId, lessonId, id}: any = useParams()
-        const [course, setCourse] = useState<Course>()
-        const [task, setTask] = useState<Task>()
+    const {courseId, moduleId, lessonId, id}: any = useParams()
+    const [course, setCourse] = useState<Course>()
+    const [task, setTask] = useState<Task>()
 
-        useEffect(() => {
-            authAxios.get<Course>(`/courses/${courseId}/`).then(res => {
-                setCourse(res.data)
-            })
+    const {error} = useTypedSelector(state => state.tasks)
+    const {homeTasks, loading: homeTasksLoading, error: homeTasksError} = useTypedSelector(state => state.homeTasks)
 
-            authAxios.get<Task>(`/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/tasks/${id}/`).then(res => {
-                setTask(res.data)
-            })
+    const {updateTask, deleteTask, clearError, fetchHomeTasks} = useActions()
+    const history = useHistory()
 
-            return () => {
-                clearError()
+    useEffect(() => {
+        authAxios.get<Course>(`/courses/${courseId}/`).then(res => {
+            setCourse(res.data)
+        })
+
+        authAxios.get<Task>(`/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/tasks/${id}/`).then(res => {
+            setTask(res.data)
+        })
+
+        fetchHomeTasks(courseId, moduleId, lessonId, id)
+
+        return () => {
+            clearError()
+        }
+
+    }, [])
+
+    const update = (values: Partial<Task> | any) => {
+        const date = values.due_date?.format('YYYY-MM-DD')
+
+        updateTask(courseId, moduleId, lessonId, id,
+            {...values, due_date: date})
+
+    }
+
+    const del = () => {
+        Modal.confirm({
+            title: 'Delete task?',
+            icon: <ExclamationCircleOutlined/>,
+            content: 'Data could not be recovered',
+            okText: 'Yes',
+            okType: 'danger',
+            cancelText: 'No',
+            onOk() {
+                deleteTask(courseId, moduleId, lessonId, id)
             }
+        })
+    }
 
-        }, [])
+    if (!task) {
+        return <div className="spinner">
+            <Spin/>
+        </div>
+    }
 
-        const {error} = useTypedSelector(state => state.tasks)
-        const {updateTask, deleteTask, clearError} = useActions()
-        const history = useHistory()
+    if (error) {
+        notification.open({
+            message: 'Error',
+            icon: <ExclamationCircleOutlined style={{color: "#f5222d"}}/>,
+            description: error.message,
+        })
+    }
 
+    const author: boolean = isAuthor(course!)
 
-        const update = (values: Partial<Task> | any) => {
-            const date = values.due_date?.format('YYYY-MM-DD')
-
-            updateTask(courseId, moduleId, lessonId, id,
-                {...values, due_date: date})
-
-        }
-
-        const del = () => {
-            Modal.confirm({
-                title: 'Delete task?',
-                icon: <ExclamationCircleOutlined/>,
-                content: 'Data could not be recovered',
-                okText: 'Yes',
-                okType: 'danger',
-                cancelText: 'No',
-                onOk() {
-                    deleteTask(courseId, moduleId, lessonId, id)
-                }
-            })
-        }
-
-        if (!task) {
-            return <div className="spinner">
-                <Spin/>
-            </div>
-        }
-
-        if (error) {
-            notification.open({
-                message: 'Error',
-                icon: <ExclamationCircleOutlined style={{color: "#f5222d"}}/>,
-                description: error.message,
-            })
-        }
-
-        const author: boolean = isAuthor(course!)
-
-        return (
-            <>
-                {author ?
+    return (
+        <>
+            {author ?
+                <>
+                    <HomeworkReview homeTasks={homeTasks} task={task} courseId={courseId} moduleId={moduleId}
+                                    lessonId={lessonId} taskId={id}/>
                     <Collapse defaultActiveKey={['1']}>
                         <Panel key="1" header="Task details">
                             <Form
@@ -144,22 +151,22 @@ const TaskPage = () => {
                             </Form>
                         </Panel>
                     </Collapse>
-                    :
-                    <div className="task-details">
-                        <h2>{task.name}</h2>
-                        <p className="p-l-10">{task.description}</p>
-                        <div className="files">
-                            FILES
-                        </div>
-                        <p style={{color: "rgba(0, 0, 0, 0.45)"}}>Due to: {moment(task.due_date).format('YYYY-MM-DD')}</p>
-                        <HomeTaskModal courseId={courseId} moduleId={moduleId} lessonId={lessonId} taskId={id}
-                                       author={author}/>
+                </>
+                :
+                <div className="task-details">
+                    <h2>{task.name}</h2>
+                    <p className="p-l-10">{task.description}</p>
+                    <div className="files">
+                        FILES
                     </div>
-                }
-                <TaskDiscussion courseId={courseId} moduleId={moduleId} lessonId={lessonId} taskId={id}/>
-            </>
-        );
-    }
-;
+                    <p style={{color: "rgba(0, 0, 0, 0.45)"}}>Due to: {moment(task.due_date).format('YYYY-MM-DD')}</p>
+                    <HomeTaskModal courseId={courseId} moduleId={moduleId} lessonId={lessonId} taskId={id}
+                                   author={author} homeTasks={homeTasks}/>
+                </div>
+            }
+            <TaskDiscussion courseId={courseId} moduleId={moduleId} lessonId={lessonId} taskId={id}/>
+        </>
+    )
+}
 
 export default TaskPage;
