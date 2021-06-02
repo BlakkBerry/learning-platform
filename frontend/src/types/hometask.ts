@@ -1,12 +1,13 @@
 import {RequestError} from "./error";
+import {User} from "./user";
 
 export interface HomeTask {
     id?: number
     name: string
     description?: string
     mark?: number
-    owner?: number
-    assignment: string
+    owner?: User
+    assignment?: string
 }
 
 export interface FetchHomeTasksAction {

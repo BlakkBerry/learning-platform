@@ -1,5 +1,6 @@
 import {RequestError} from "../../types/error";
 import {Lesson, LessonAction, LessonActionTypes, LessonState} from "../../types/lesson";
+import {CommonAction, CommonActionTypes} from "../../types/common";
 
 const initialState: LessonState = {
     lessons: [],
@@ -7,7 +8,7 @@ const initialState: LessonState = {
     error: null
 }
 
-export const lessonReducer = (state = initialState, action: LessonAction): LessonState => {
+export const lessonReducer = (state = initialState, action: LessonAction | CommonAction): LessonState => {
     const setLoading = (): LessonState => ({...state, loading: true, error: null})
     const setLessons = (lessons: Array<Lesson>): LessonState => ({...state, loading: false, error: null, lessons})
     const setError = (error: RequestError): LessonState => ({...state, loading: false, error: error})
@@ -42,6 +43,9 @@ export const lessonReducer = (state = initialState, action: LessonAction): Lesso
 
         case LessonActionTypes.DELETE_LESSON_SUCCESS:
             return setLessons(state.lessons.filter(lesson => lesson.id !== action.lessonId))
+
+        case CommonActionTypes.CLEAR_ERROR:
+            return {...state, error: null}
 
         default:
             return state

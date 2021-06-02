@@ -1,5 +1,6 @@
 import {RequestError} from "../../types/error";
 import {Task, TaskAction, TaskActionTypes, TaskState} from "../../types/task";
+import {CommonAction, CommonActionTypes} from "../../types/common";
 
 const initialState: TaskState = {
     tasks: [],
@@ -7,7 +8,7 @@ const initialState: TaskState = {
     error: null
 }
 
-export const taskReducer = (state = initialState, action: TaskAction): TaskState => {
+export const taskReducer = (state = initialState, action: TaskAction | CommonAction): TaskState => {
     const setLoading = (): TaskState => ({...state, loading: true, error: null})
     const setTasks = (tasks: Array<Task>): TaskState => ({...state, loading: false, error: null, tasks})
     const setError = (error: RequestError): TaskState => ({...state, loading: false, error: error})
@@ -42,6 +43,11 @@ export const taskReducer = (state = initialState, action: TaskAction): TaskState
 
         case TaskActionTypes.DELETE_TASK_SUCCESS:
             return setTasks(state.tasks.filter(task => task.id !== action.taskId))
+
+        case CommonActionTypes.CLEAR_ERROR:
+            return {...state, error: null}
+
+
         default:
             return state
     }

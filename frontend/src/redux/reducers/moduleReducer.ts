@@ -1,5 +1,6 @@
 import {Module, ModuleAction, ModuleActionTypes, ModuleState} from "../../types/module";
 import {RequestError} from "../../types/error";
+import {CommonAction, CommonActionTypes} from "../../types/common";
 
 
 const initialState: ModuleState = {
@@ -8,7 +9,7 @@ const initialState: ModuleState = {
     error: null
 }
 
-export const moduleReducer = (state = initialState, action: ModuleAction): ModuleState => {
+export const moduleReducer = (state = initialState, action: ModuleAction | CommonAction): ModuleState => {
     const setLoading = (): ModuleState => ({...state, loading: true, error: null})
     const setModules = (modules: Module[]): ModuleState => ({...state, loading: false, error: null, modules})
     const setError = (error: RequestError): ModuleState => ({...state, loading: false, error: error})
@@ -45,6 +46,10 @@ export const moduleReducer = (state = initialState, action: ModuleAction): Modul
 
         case ModuleActionTypes.DELETE_MODULE_SUCCESS:
             return setModules(state.modules.filter(module => module.id !== action.moduleId))
+
+        case CommonActionTypes.CLEAR_ERROR:
+            return {...state, error: null}
+
         default:
             return state
     }

@@ -4,6 +4,7 @@ import * as ModuleActions from './module'
 import * as LessonAction from './lesson'
 import * as TaskAction from './task'
 import * as HomeTaskAction from './hometask'
+import * as CommonActions from './common'
 
 export const Actions = {
     ...CourseActions,
@@ -11,5 +12,6 @@ export const Actions = {
     ...ModuleActions,
     ...LessonAction,
     ...TaskAction,
-    ...HomeTaskAction
+    ...HomeTaskAction,
+    ...CommonActions
 }

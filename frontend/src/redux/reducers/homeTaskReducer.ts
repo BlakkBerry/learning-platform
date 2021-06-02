@@ -1,5 +1,6 @@
 import {HomeTask, HomeTaskAction, HomeTaskActionTypes, HomeTaskState} from "../../types/hometask";
 import {RequestError} from "../../types/error";
+import {CommonAction, CommonActionTypes} from "../../types/common";
 
 const initialState: HomeTaskState = {
     homeTasks: [],
@@ -7,7 +8,7 @@ const initialState: HomeTaskState = {
     error: null
 }
 
-export const homeTaskReducer = (state = initialState, action: HomeTaskAction): HomeTaskState => {
+export const homeTaskReducer = (state = initialState, action: HomeTaskAction | CommonAction): HomeTaskState => {
     const setLoading = (): HomeTaskState => ({...state, loading: true, error: null})
     const setTasks = (homeTasks: Array<HomeTask>): HomeTaskState => ({...state, loading: false, error: null, homeTasks})
     const setError = (error: RequestError): HomeTaskState => ({...state, loading: false, error: error})
@@ -42,6 +43,9 @@ export const homeTaskReducer = (state = initialState, action: HomeTaskAction): H
 
         case HomeTaskActionTypes.DELETE_HOMETASK_SUCCESS:
             return setTasks(state.homeTasks.filter(homeTask => homeTask.id !== action.homeTaskId))
+
+        case CommonActionTypes.CLEAR_ERROR:
+            return {...state, error: null}
 
         default:
             return state
