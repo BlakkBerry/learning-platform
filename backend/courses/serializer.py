@@ -158,7 +158,7 @@ class HomeTaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = HomeTask
-        fields = ('id', 'owner', 'name', 'mark', 'text', 'file', 'image', 'video',)
+        fields = ('id', 'description', 'owner', 'name', 'mark', 'text', 'file', 'image', 'video',)
         read_only_fields = ('owner',)
 
     def validate_mark(self, value):
