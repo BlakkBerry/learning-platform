@@ -26,10 +26,6 @@ const HomeTaskModal: FC<HomeTaskModalProps> = ({courseId, moduleId, lessonId, ta
 
     const [fileList, setFileList] = useState<any[]>([])
 
-    const handleChange = (event: any) => {
-
-    }
-
     const onRemove = (file: any) => {
         authAxios.delete(`/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/tasks/${taskId}/home_tasks/${homeTasks[0].id}/files/${file.id}/`)
             .then(response => {
@@ -38,7 +34,7 @@ const HomeTaskModal: FC<HomeTaskModalProps> = ({courseId, moduleId, lessonId, ta
             })
     }
 
-    const uploadFile = (file: any, homeTask: HomeTask) => {
+    const uploadFile = (file: any) => {
         const formData = new FormData()
         formData.append('file_item', file)
         formData.append('title', file.name)
@@ -69,12 +65,20 @@ const HomeTaskModal: FC<HomeTaskModalProps> = ({courseId, moduleId, lessonId, ta
     }
 
     const settings = {
-        onChange: handleChange,
         multiple: false,
     }
 
 
     useEffect(() => {
+        if (homeTasks.length) {
+            const initialData = homeTasks[0].file?.map(file => ({
+                id: file.id,
+                name: file.title,
+                status: 'done',
+                url: file.file_item
+            })) as any
+            setFileList(initialData)
+        }
         return () => {
             clearError()
         }
@@ -112,10 +116,12 @@ const HomeTaskModal: FC<HomeTaskModalProps> = ({courseId, moduleId, lessonId, ta
                 />
             </Form.Item>
 
-            <Upload {...settings} fileList={fileList} onRemove={onRemove}
-                    customRequest={({file}) => uploadFile(file, homeTasks[0])}>
-                <Button icon={<UploadOutlined/>}>Click to Upload</Button>
-            </Upload>
+            {homeTasks.length ?
+                <Upload {...settings} fileList={fileList} onRemove={onRemove}
+                        customRequest={({file}) => uploadFile(file)}>
+                    <Button icon={<UploadOutlined/>}>Click to Upload</Button>
+                </Upload> : null
+            }
 
             <div style={{display: 'flex', justifyContent: 'space-between'}}>
                 <Form.Item>
@@ -130,8 +136,9 @@ const HomeTaskModal: FC<HomeTaskModalProps> = ({courseId, moduleId, lessonId, ta
 
     const submitModal = (values: any) => {
         setIsModalVisible(false)
-        if (homeTasks[0]) {
+        if (homeTasks.length) {
             updateHomeTask(courseId, moduleId, lessonId, taskId, homeTasks[0].id!, values)
+            setFileList([...fileList])
         } else {
             createHomeTask(courseId, moduleId, lessonId, taskId, values)
         }
@@ -151,13 +158,6 @@ const HomeTaskModal: FC<HomeTaskModalProps> = ({courseId, moduleId, lessonId, ta
                 size='large'
                 onClick={() => {
                     setIsModalVisible(true)
-                    const initialData = homeTasks[0].file?.map(file => ({
-                        id: file.id,
-                        name: file.title,
-                        status: 'done',
-                        url: file.file_item
-                    })) as any
-                    setFileList(initialData)
                 }}
         >{homeTasks.length ? 'View homework' : 'Add homework'}</Button>
 
