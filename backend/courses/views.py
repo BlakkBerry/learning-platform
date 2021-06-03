@@ -133,7 +133,6 @@ class HomeTaskAPI(ListMixin, RetrieveMixin, StudentCreateMixin, AuthorDestroyMix
 
     def get_queryset(self, **kwargs):
         user = self.request.user
-        print(user)
         queryset = HomeTask.objects.filter(
             Q(assignment__lesson__module__course__author=user) |
             Q(assignment__lesson__module__course__students=user)) \
@@ -141,11 +140,8 @@ class HomeTaskAPI(ListMixin, RetrieveMixin, StudentCreateMixin, AuthorDestroyMix
             .filter(assignment__lesson__module__course__pk=kwargs['pk'], assignment__lesson__module__pk=kwargs['mpk'],
                     assignment__lesson__pk=kwargs['lpk'], assignment__pk=kwargs['tpk'])
 
-        print(queryset)
         if is_student(user, kwargs['pk']):
-            print("??????")
             queryset = queryset.filter(owner=user)
-        print(queryset)
         return queryset
 
     def get_instance(self, **kwargs):
