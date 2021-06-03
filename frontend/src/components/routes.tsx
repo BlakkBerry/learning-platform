@@ -5,7 +5,7 @@ import NotFoundPage from "./Main/NotFound/NotFoundPage";
 import AuthLayout from "./Auth/AuthLayout";
 import LoginPage from "./Auth/LoginPage/LoginPage";
 import SignupPage from "./Auth/SignupPage/SignupPage";
-import Progress from "./Main/Homepage/Progess/Progress";
+import ProgressPage from "./Main/Homepage/Progess/ProgressPage";
 import Files from "./Main/Homepage/CourseFiles/Files";
 import CoursePage from "./Main/Homepage/Courses/CoursePage";
 import ModulePage from "./Main/Homepage/Courses/Modules/ModulePage";
@@ -61,7 +61,7 @@ const routes: Array<Route> = [
         path: '/progress',
         exact: true,
         name: 'Progress',
-        component: Progress,
+        component: ProgressPage,
         layout: MainLayout
     },
     {
