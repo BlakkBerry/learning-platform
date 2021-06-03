@@ -6,13 +6,17 @@ from users.models import CustomUser
 
 
 def is_author(user, course_pk):
-    course = get_object_or_404(get_object_or_404(CustomUser, pk=user.pk).course_author, pk=course_pk)
-    return course.author == user
+    course = get_object_or_404(CustomUser, pk=user.pk).course_author.filter(pk=course_pk)
+    if len(course):
+        return course.get().author == user
+    return False
 
 
 def is_student(user, course_pk):
-    course = get_object_or_404(get_object_or_404(CustomUser, pk=user.pk).course_students, pk=course_pk)
-    return user in [student for student in course.students.get_queryset()]
+    course = get_object_or_404(CustomUser, pk=user.pk).course_students.filter(pk=course_pk)
+    if len(course):
+        return user in [student for student in course.get().students.get_queryset()]
+    return False
 
 
 def in_time(due_date):

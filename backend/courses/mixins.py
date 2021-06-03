@@ -25,6 +25,7 @@ class ListMixin(viewsets.GenericViewSet, mixins.ListModelMixin):
         pass
 
     def list(self, request, *args, **kwargs):
+        print(kwargs)
         queryset = self.get_queryset(**kwargs)
         page = self.paginate_queryset(queryset)
         if page is not None:
