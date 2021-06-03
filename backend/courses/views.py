@@ -132,7 +132,7 @@ class HomeTaskAPI(ListMixin, RetrieveMixin, StudentCreateMixin, AuthorDestroyMix
     ]
 
     def get_queryset(self, **kwargs):
-        user = self.request.user.id
+        user = self.request.user
         queryset = HomeTask.objects.filter(
             Q(assignment__lesson__module__course__author=user) |
             Q(assignment__lesson__module__course__students=user)) \
