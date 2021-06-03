@@ -1,8 +1,8 @@
 from django.db import models
 from django.utils.crypto import get_random_string
-from .validators import FileSizeValidator
 
 from users.models import CustomUser
+from .validators import FileSizeValidator
 
 
 def get_random_hash():
@@ -21,8 +21,8 @@ class Course(models.Model):
     section = models.CharField(max_length=100, null=True, blank=True)
     audience = models.CharField(max_length=100, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
-    students = models.ManyToManyField(CustomUser, blank=True, related_name='courses')
-    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
+    students = models.ManyToManyField(CustomUser, blank=True, related_name='course_students')
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, related_name='course_author')
 
     def __str__(self):
         return self.name
