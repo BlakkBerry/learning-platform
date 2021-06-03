@@ -88,7 +88,7 @@ const TaskPage = () => {
             {author ?
                 <>
                     <HomeworkReview homeTasks={homeTasks} task={task} courseId={courseId} moduleId={moduleId}
-                                    lessonId={lessonId} taskId={id}/>
+                                    lessonId={lessonId} taskId={id} author={author}/>
                     <Collapse defaultActiveKey={['1']}>
                         <Panel key="1" header="Task details">
                             <Form

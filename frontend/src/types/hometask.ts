@@ -1,5 +1,6 @@
 import {RequestError} from "./error";
 import {User} from "./user";
+import {HomeTaskFile} from "./file";
 
 export interface HomeTask {
     id?: number
@@ -8,6 +9,7 @@ export interface HomeTask {
     mark?: number
     owner?: User
     assignment?: string
+    file?: HomeTaskFile[]
 }
 
 export interface FetchHomeTasksAction {

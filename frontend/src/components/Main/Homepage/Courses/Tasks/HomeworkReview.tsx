@@ -5,6 +5,7 @@ import {useTypedSelector} from "../../../../../hooks/useTypedSelector";
 import {Task} from "../../../../../types/task";
 import {useActions} from "../../../../../hooks/useActions";
 import {ExclamationCircleOutlined} from "@ant-design/icons";
+import Files from "../../CourseFiles/Files";
 
 interface HomeworkReviewProps {
     homeTasks: HomeTask[]
@@ -13,9 +14,10 @@ interface HomeworkReviewProps {
     moduleId: number
     lessonId: number
     taskId: number
+    author: boolean
 }
 
-const HomeworkReview: FC<HomeworkReviewProps> = ({homeTasks, task, courseId, moduleId, lessonId, taskId}) => {
+const HomeworkReview: FC<HomeworkReviewProps> = ({homeTasks, task, courseId, moduleId, lessonId, taskId, author}) => {
 
     const [visible, setVisible] = useState(false);
     const {loading, error} = useTypedSelector(state => state.homeTasks)
@@ -40,6 +42,7 @@ const HomeworkReview: FC<HomeworkReviewProps> = ({homeTasks, task, courseId, mod
         updateHomeTask(courseId, moduleId, lessonId, taskId, homeTask.id!, {...homeTask, ...values})
         setIsModalVisible(false)
     }
+
 
     if (error) {
         notification.open({
@@ -89,7 +92,7 @@ const HomeworkReview: FC<HomeworkReviewProps> = ({homeTasks, task, courseId, mod
                                                 </Button>
                                             </Badge>
                                         </div>}
-                                    description={homeTask.description}
+                                    description={homeTask.owner!.username ? homeTask.owner!.username : `homework ${homeTask.id}`}
                                 >
                                 </List.Item.Meta> : <div className="spinner"><Spin/></div>}
                             </List.Item>
@@ -98,11 +101,9 @@ const HomeworkReview: FC<HomeworkReviewProps> = ({homeTasks, task, courseId, mod
                                    onCancel={() => setIsModalVisible(false)}
                                    footer={null}>
                                 <h4>{homeTask.name}</h4>
-                                <p>{homeTask.description} Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                    Consectetur dolor error iste libero magni molestias odit recusandae reiciendis
-                                    temporibus voluptate.</p>
+                                <p>{homeTask.description}</p>
                                 <div className="files">
-                                    FILES
+                                    <Files author={author} homeTask={homeTask}/>
                                 </div>
                                 <Form name="basic"
                                       initialValues={{

@@ -1,5 +1,5 @@
 import React, {FC, useEffect, useState} from 'react';
-import {Badge, Button, Form, Input, Modal, notification, Upload} from "antd";
+import {Button, Form, Input, Modal, notification, Upload} from "antd";
 import {ExclamationCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import {useActions} from "../../../../../hooks/useActions";
 import {useTypedSelector} from "../../../../../hooks/useTypedSelector";
@@ -7,6 +7,7 @@ import TextArea from "antd/es/input/TextArea";
 import {UploadOutlined} from '@ant-design/icons';
 import {HomeTask} from "../../../../../types/hometask";
 import './HomeworkModal.css'
+import {authAxios} from "../../../../../utils/axios";
 
 interface HomeTaskModalProps {
     courseId: number
@@ -21,6 +22,57 @@ const HomeTaskModal: FC<HomeTaskModalProps> = ({courseId, moduleId, lessonId, ta
     const [isModalVisible, setIsModalVisible] = useState(false)
     const {loading, error} = useTypedSelector(state => state.homeTasks)
     const {createHomeTask, clearError, updateHomeTask} = useActions()
+
+
+    const [fileList, setFileList] = useState<any[]>([])
+
+    const handleChange = (event: any) => {
+
+    }
+
+    const onRemove = (file: any) => {
+        authAxios.delete(`/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/tasks/${taskId}/home_tasks/${homeTasks[0].id}/files/${file.id}/`)
+            .then(response => {
+                const newFileList = fileList.filter(item => item.uid != file.uid)
+                setFileList([...newFileList])
+            })
+    }
+
+    const uploadFile = (file: any, homeTask: HomeTask) => {
+        const formData = new FormData()
+        formData.append('file_item', file)
+        formData.append('title', file.name)
+
+        const newFileList = [{
+            uid: file.uid,
+            id: null,
+            name: file.name,
+            status: 'uploading',
+            url: ''
+        }]
+        setFileList([...fileList, ...newFileList])
+
+        authAxios.post(`/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/tasks/${taskId}/home_tasks/${homeTasks[0].id}/files/`, formData)
+            .then(response => {
+                setFileList(prevState => prevState.map(item => {
+                    if (item.uid == file.uid)
+                        return {...item, id: response.data.id, status: 'done', url: response.data.file_item,}
+                    return item
+                }))
+                return response
+            })
+            .catch(error => {
+                const res = fileList.filter(item => item.uid != file.uid)
+                const current = fileList.filter(item => item.uid == file.uid)
+                setFileList([...res, {...current, status: 'error'}])
+            })
+    }
+
+    const settings = {
+        onChange: handleChange,
+        multiple: false,
+    }
+
 
     useEffect(() => {
         return () => {
@@ -60,7 +112,8 @@ const HomeTaskModal: FC<HomeTaskModalProps> = ({courseId, moduleId, lessonId, ta
                 />
             </Form.Item>
 
-            <Upload defaultFileList={[]}>
+            <Upload {...settings} fileList={fileList} onRemove={onRemove}
+                    customRequest={({file}) => uploadFile(file, homeTasks[0])}>
                 <Button icon={<UploadOutlined/>}>Click to Upload</Button>
             </Upload>
 
@@ -98,6 +151,13 @@ const HomeTaskModal: FC<HomeTaskModalProps> = ({courseId, moduleId, lessonId, ta
                 size='large'
                 onClick={() => {
                     setIsModalVisible(true)
+                    const initialData = homeTasks[0].file?.map(file => ({
+                        id: file.id,
+                        name: file.title,
+                        status: 'done',
+                        url: file.file_item
+                    })) as any
+                    setFileList(initialData)
                 }}
         >{homeTasks.length ? 'View homework' : 'Add homework'}</Button>
 
