@@ -1,2 +1,2 @@
 # learning-platform
-Learning platform for learning
+Easy-to-use learning platform for teachers and students
